@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8" />
+  <title>Algeria Parcels Distribution Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(-45deg, #23d5ab, #23a6d5, #e73c7e, #ee7752);
+      background-size: 400% 400%; animation: gradientBG 15s ease infinite;
+      font-family: sans-serif; padding: 2rem; color: #1a1a2e;
+    }
+    @keyframes gradientBG {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .container {
+      background: white; border-radius: 10px; padding: 25px;
+      max-width: 1400px; margin: auto; box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+    h2 { color: white; text-align: center; margin-bottom: 20px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+    #map { height: 750px; border-radius: 12px; border: 2px solid #ee7752; }
+    .back-btn {
+      position: absolute; top: 30px; left: 40px; z-index: 2000;
+      background-color: #4361ee; color: white; padding: 10px 20px; border-radius: 8px;
+      text-decoration: none;
+    }
+    .warehouse-icon {
+      width: 28px; height: 28px; display: flex; justify-content: center; align-items: center;
+      font-size: 15px; font-weight: bold; border-radius: 50%; border: 2px solid #fff;
+      background: #fbbf24; color: #222;
+    }
+    .leaflet-marker-icon { display: block !important; opacity: 1 !important; }
+    .info-panel {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      max-width: 300px;
+    }
+    .legend {
+      line-height: 18px;
+      color: #555;
+    }
+    .legend i {
+      width: 18px;
+      height: 18px;
+      float: left;
+      margin-right: 8px;
+      opacity: 0.7;
+    }
+    .stats-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .stats-table th, .stats-table td {
+      padding: 5px;
+      border: 1px solid #ddd;
+      text-align: left;
+    }
+    .stats-table th {
+      background-color: #f2f2f2;
+    }
+    
+  </style>
+</head>
+<body>
+<a href="/resregion" class="back-btn"><i class="fas fa-arrow-left me-2"></i> Back to Dashboard</a>
+<h2><i class="fas fa-map-marked-alt"></i> Algeria - Parcels Distribution Map</h2>
+<div class="container">
+  <div id="map"></div>
+</div>
+
+<div class="modal fade" id="packagesModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header text-white" style="background-color: #fbbf24;">
+        <h5 class="modal-title"><i class="fas fa-box me-2"></i> Parcel Details</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <h4 id="wilayaName" class="text-center mb-3"></h4>
+        <div class="text-center mb-3">
+          <span><b>Total Parcels:</b> <span id="totalPackages"></span> | </span>
+          <span><b>Volume:</b> <span id="totalVolume"></span> cm³ | </span>
+          <span><b>Weight:</b> <span id="totalWeight"></span> kg | </span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Destination</th>
+                <th>Source</th>
+                <th>Weight (kg)</th>
+                <th>Volume (cm³)</th>
+                <th>Type</th>
+                <th>Return</th>
+              </tr>
+            </thead>
+            <tbody id="packagesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const data = <%- JSON.stringify(data) %>;
+
+
+  const warehousesArray = Array.isArray(data.warehouses) && data.warehouses.length > 0 
+    ? data.warehouses 
+    : (data.warehouse ? [data.warehouse] : []);
+
+  const wilayasData = [
+    ...data.wilayas,
+    ...warehousesArray.map(wh => ({
+      id: wh.id,
+      name: wh.name,
+      lat: wh.lat,
+      lon: wh.lon,
+      totalPackages: wh.totalPackages,
+      totalWeight: wh.totalWeight,
+      totalVolume: wh.totalVolume,
+      packages: wh.packages,
+      isWarehouse: true
+    }))
+  ];
+
+  const packagesData = {};
+  wilayasData.forEach(w => {
+    packagesData[w.id] = w.packages || [];
+  });
+
+  // Initialize map
+  const map = L.map('map').setView([28.0339, 1.6596], 6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  function buildPopup(w) {
+    return `
+      <div style="min-width: 200px">
+        <h5 style="margin: 5px 0; color: ${w.isWarehouse ? '#fbbf24' : '#2c3e50'}">
+          ${w.name} ${w.isWarehouse ? '(Warehouse)' : ''}
+        </h5>
+        <p style="margin: 5px 0"><b>Coordinates:</b> ${w.lat.toFixed(4)}, ${w.lon.toFixed(4)}</p>
+        <hr style="margin: 8px 0">
+        <p style="margin: 5px 0"><b>Parcels:</b> ${w.totalPackages}</p>
+        <p style="margin: 5px 0"><b>Weight:</b> ${w.totalWeight} kg</p>
+        <p style="margin: 5px 0"><b>Volume:</b> ${w.totalVolume} cm³</p>
+        <button onclick="showPackagesModal(${w.id})" 
+                class="btn btn-sm w-100 mt-2" 
+                style="background-color: ${w.isWarehouse ? '#fbbf24' : '#4361ee'}; color: white">
+          View Details
+        </button>
+      </div>
+    `;
+  }
+
+  wilayasData.forEach(w => {
+    let icon;
+    if (w.isWarehouse) {
+      icon = L.divIcon({ html: '<div class="warehouse-icon">W</div>', className: 'warehouse-marker' });
+    } else {
+      icon = L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41]
+      });
+    }
+
+    const marker = L.marker([w.lat, w.lon], { icon })
+      .addTo(map)
+      .bindPopup(buildPopup(w));
+    w.marker = marker;
+  });
+
+  map.fitBounds(L.latLngBounds(wilayasData.map(w => [w.lat, w.lon])).pad(0.3));
+
+  function showPackagesModal(id) {
+    const w = wilayasData.find(w => w.id === id);
+    const pkgs = packagesData[id] || [];
+    
+    document.getElementById('wilayaName').textContent = `${w.name} ${w.isWarehouse ? '(Warehouse)' : ''}`;
+    document.getElementById('totalPackages').textContent = w.totalPackages;
+    document.getElementById('totalVolume').textContent = w.totalVolume;
+    document.getElementById('totalWeight').textContent = w.totalWeight;
+
+    const tbody = document.getElementById('packagesBody');
+    tbody.innerHTML = '';
+    
+    pkgs.forEach(p => {
+      tbody.innerHTML += `
+        <tr>
+          <td>${p.name}</td>
+          <td>${p.destination}</td>
+          <td>${p.source}</td>
+          <td>${p.weight}</td>
+          <td>${p.volume}</td>
+          <td>${p.type || '—'}</td>
+          <td>${p.returnn === 1 ? 'Yes' : 'No'}</td>
+        </tr>
+      `;
+    });
+
+    new bootstrap.Modal(document.getElementById('packagesModal')).show();
+  }
+
+  updateSummaryStats();
+
+  window.showPackagesModal = showPackagesModal;
+</script>
+
+</body>
+</html>

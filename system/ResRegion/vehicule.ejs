@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Trucks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4ad66d;
+            --warning-color: #f8961e;
+            --danger-color: #ef233c;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --border-color: #e0e0e0;
+            --text-muted: #6c757d;
+            --truck-color: #f72585;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            color: var(--dark-color);
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            padding: 2rem;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .back-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .search-filter-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .truck-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .truck-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .truck-id {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: var(--truck-color);
+            letter-spacing: 0.5px;
+        }
+
+        .truck-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .detail-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--truck-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-section h3 i {
+            font-size: 1rem;
+        }
+
+        .detail-group {
+            margin-bottom: 0.8rem;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.3rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .action-btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn-edit {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+        }
+
+        .btn-edit:hover {
+            background-color: #d0e3fa;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #d61f2f;
+            transform: translateY(-2px);
+        }
+
+        .btn-add {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-add:hover {
+            background-color: #3ac05d;
+            transform: translateY(-2px);
+        }
+
+        .no-trucks, .no-results {
+            text-align: center;
+            padding: 3rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-top: 1rem;
+        }
+
+        .no-trucks i, .no-results i {
+            font-size: 3.5rem;
+            color: #ddd;
+            margin-bottom: 1.5rem;
+        }
+
+        .no-trucks p, .no-results p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 95%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            margin-bottom: 1.5rem;
+            color: var(--truck-color);
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .modal-title i {
+            color: var(--warning-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.7rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--truck-color);
+            box-shadow: 0 0 0 3px rgba(247, 37, 133, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .alert-success {
+            background-color: var(--success-color);
+        }
+
+        .alert-error {
+            background-color: var(--danger-color);
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/resregion" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1 class="page-title"><i class="fas fa-truck"></i> Manage Trucks</h1>
+        
+        <div class="search-filter-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by id, name or license plate..." oninput="filterTrucks()">
+                <i class="fas fa-search"></i>
+            </div>
+            <button class="action-btn btn-add" onclick="showAddModal()">
+                <i class="fas fa-plus"></i> Add Truck
+            </button>
+        </div>
+
+        <% if (trucks.length > 0) { %>
+            <div id="trucksContainer">
+                <% trucks.forEach(truck => { %>
+                    <div class="truck-card" data-id="<%= truck.id %>" data-plate="<%= truck.plate_number.toLowerCase() %>">                       
+                        <div class="truck-header">
+                            <span class="truck-id">TRK-<%= truck.id %></span>
+                        </div>
+
+                        <div class="truck-details">
+                            <!-- Basic Info -->
+                            <div class="detail-section">
+                                <h3><i class="fas fa-truck"></i> Basic Info</h3>
+                                <div class="detail-group">
+                                    <div class="detail-label">License Plate</div>
+                                    <div class="detail-value"><%= truck.plate_number %></div>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">Make & Model</div>
+                                    <div class="detail-value model-value"><%= truck.make_model %></div>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">Year</div>
+                                    <div class="detail-value"><%= truck.year %></div>
+                                </div>
+                            </div>
+
+                            <!-- Capacity Info -->
+                            <div class="detail-section">
+                                <h3><i class="fas fa-weight-hanging"></i> Capacity</h3>
+                                <div class="detail-group">
+                                    <div class="detail-label">Max Load (kg)</div>
+                                    <div class="detail-value"><%= truck.max_weight %></div>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">Volume (cm³)</div>
+                                    <div class="detail-value"><%= truck.max_volume %></div>
+                                </div>
+                            </div>
+
+                            <!-- Status Info -->
+                            <div class="detail-section">
+                                <h3><i class="fas fa-info-circle"></i> Status</h3>
+                                <div class="detail-group">
+                                    <div class="detail-label">Current Status</div>
+                                    <div class="detail-value"><%= truck.current_status %></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="action-btn btn-edit" onclick="showEditModal('<%= truck.id %>')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn btn-delete" onclick="showDeleteModal('<%= truck.id %>', '<%= truck.plate_number %>')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+                <i class="fas fa-truck-loading"></i>
+                <p>No trucks match your search criteria</p>
+            </div>
+        <% } else { %>
+            <div class="no-trucks">
+                <i class="fas fa-truck-moving"></i>
+                <p>No trucks found</p>
+            </div>
+        <% } %>
+
+        <!-- Add/Edit Truck Modal -->
+        <div class="modal" id="truckModal">
+            <div class="modal-content">
+                <h3 class="modal-title" id="modalTitle"><i class="fas fa-truck"></i> Add New Truck</h3>
+                <form id="truckForm">
+                    <input type="hidden" id="truckId">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="licensePlate">License Plate *</label>
+                            <input type="text" id="licensePlate" class="form-control" required>
+                            <div class="error-message" id="plateError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter license plate
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="year">Year *</label>
+                            <input type="number" id="year" class="form-control" min="2000" max="<%= new Date().getFullYear() + 1 %>" required>
+                            <div class="error-message" id="yearError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter valid year
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="model">Model And Make *</label>
+                            <input type="text" id="model" class="form-control" required>
+                            <div class="error-message" id="modelError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter model
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="maxLoad">Max Load (kg) *</label>
+                            <input type="number" id="maxLoad" class="form-control" min="1000" required>
+                            <div class="error-message" id="loadError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter max load
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="volume">Volume (cm³) *</label>
+                            <input type="number" id="volume" class="form-control" step="0.1" min="1" required>
+                            <div class="error-message" id="volumeError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter volume
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                            <label for="status">Status *</label>
+                            <input type="text" id="status" class="form-control" required placeholder="Enter truck status (e.g., Available, In Maintenance)">
+                            <div class="error-message" id="statusError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter status
+                            </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="closeModal('truckModal')" class="action-btn" style="background: #ccc;">Cancel</button>
+                        <button type="submit" class="action-btn btn-add">
+                            <i class="fas fa-save"></i> Save Truck
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal" id="deleteModal">
+            <div class="modal-content">
+                <h3 class="modal-title"><i class="fas fa-trash-alt" style="color: var(--danger-color)"></i> Delete Truck</h3>
+                <p id="deleteMessage">Are you sure you want to delete this truck? This action cannot be undone.</p>
+                <div class="modal-actions">
+                    <button onclick="closeModal('deleteModal')" class="action-btn" style="background: #ccc;">Cancel</button>
+                    <button onclick="deleteTruck()" class="action-btn btn-delete">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </div>
+                <input type="hidden" id="truckToDelete">
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // Global variables
+    let currentTruckId = null;
+    let isEditMode = false;
+
+    // Filter trucks function
+    function filterTrucks() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    const trucks = document.querySelectorAll('.truck-card');
+    let hasResults = false;
+    
+    trucks.forEach(truck => {
+        const truckPlate = truck.getAttribute('data-plate');
+        const truckModel = truck.querySelector('.model-value').textContent.toLowerCase();
+        
+        if (truckPlate.includes(searchTerm) || truckModel.includes(searchTerm)) {
+            truck.style.display = 'block';
+            hasResults = true;
+        } else {
+            truck.style.display = 'none';
+        }
+    });
+    
+    document.getElementById('noResults').style.display = hasResults ? 'none' : 'block';
+}
+
+    // Show add truck modal
+    function showAddModal() {
+        isEditMode = false;
+        document.getElementById('modalTitle').innerHTML = '<i class="fas fa-truck"></i> Add New Truck';
+        document.getElementById('truckForm').reset();
+        document.getElementById('truckId').value = '';
+        openModal('truckModal');
+    }
+
+    // Show edit truck modal
+    async function showEditModal(truckId) {
+        isEditMode = true;
+        currentTruckId = truckId;
+        
+        try {
+            // Fetch truck data from server
+            const response = await fetch(`/trucks/${truckId}`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch truck data');
+            }
+            
+            const truck = await response.json();
+            
+            // Fill the form with truck data
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-truck-moving"></i> Edit Truck';
+            document.getElementById('truckId').value = truck.id;
+            document.getElementById('licensePlate').value = truck.plate_number || '';
+            document.getElementById('model').value = truck.make_model || '';
+            document.getElementById('year').value = truck.year || '';
+            document.getElementById('maxLoad').value = truck.max_weight || '';
+            document.getElementById('volume').value = truck.max_volume || '';
+            document.getElementById('status').value = truck.current_status || '';
+            
+            openModal('truckModal');
+        } catch (error) {
+            showAlert('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Show delete confirmation modal
+    function showDeleteModal(truckId, licensePlate) {
+        currentTruckId = truckId;
+        document.getElementById('truckToDelete').value = truckId;
+        document.getElementById('deleteMessage').textContent = 
+            `Are you sure you want to delete truck "${licensePlate}"? This action cannot be undone.`;
+        openModal('deleteModal');
+    }
+
+    // Handle form submission
+    document.getElementById('truckForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        // Validate form
+        if (!validateForm()) return;
+        
+        const formData = {
+            licensePlate: document.getElementById('licensePlate').value.trim(),
+            model: document.getElementById('model').value.trim(),
+            year: document.getElementById('year').value,
+            maxLoad: document.getElementById('maxLoad').value,
+            volume: document.getElementById('volume').value,
+            status: document.getElementById('status').value,
+        };
+        
+        try {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            
+            // Determine the API endpoint and method based on edit/add mode
+            const url = isEditMode ? `/trucks/${currentTruckId}` : '/trucks';
+            const method = isEditMode ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to save truck');
+            }
+            
+            const result = await response.json();
+            closeModal('truckModal');
+            
+            // Reload the page to reflect changes
+            window.location.reload();
+        } catch (error) {
+            showAlert('Error: ' + error.message, 'error');
+        } finally {
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-save"></i> Save Truck';
+            }
+        }
+    });
+
+    // Delete truck
+    async function deleteTruck() {
+        try {
+            const response = await fetch(`/trucks/${currentTruckId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.message || 'Failed to delete truck');
+            }
+            
+            closeModal('deleteModal');
+            
+            // Reload the page to reflect changes
+            window.location.reload();
+        } catch (error) {
+            showAlert('Error: ' + error.message, 'error');
+        }
+    }
+
+    // Form validation
+    function validateForm() {
+        let isValid = true;
+        
+        // Reset error messages
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.style.display = 'none';
+        });
+        
+        // Validate required fields
+        const requiredFields = [
+            { id: 'licensePlate', errorId: 'plateError' },
+            { id: 'year', errorId: 'yearError' },
+            { id: 'model', errorId: 'modelError' },
+            { id: 'maxLoad', errorId: 'loadError' },
+            { id: 'volume', errorId: 'volumeError' },
+            { id: 'status', errorId: 'statusError' }
+        ];
+        
+        requiredFields.forEach(field => {
+            const value = document.getElementById(field.id).value.trim();
+            if (!value) {
+                document.getElementById(field.errorId).style.display = 'flex';
+                isValid = false;
+            }
+        });
+        
+        // Additional validation for year
+        const year = document.getElementById('year').value;
+        const currentYear = new Date().getFullYear();
+        if (year && (year < 2000 || year > currentYear + 1)) {
+            document.getElementById('yearError').textContent = `Please enter year between 2000 and ${currentYear + 1}`;
+            document.getElementById('yearError').style.display = 'flex';
+            isValid = false;
+        }
+        
+        return isValid;
+    }
+
+    // Open modal
+    function openModal(modalId) {
+        document.getElementById(modalId).style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    // Close modal
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+
+    // Show alert message
+    function showAlert(message, type) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type}`;
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(alert);
+        
+        setTimeout(() => {
+            alert.classList.add('fade-out');
+            setTimeout(() => alert.remove(), 500);
+        }, 3000);
+    }
+    </script>
+</body>
+</html>

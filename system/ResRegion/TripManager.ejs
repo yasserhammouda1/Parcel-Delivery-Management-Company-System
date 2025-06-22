@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Management</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --success-color: #4ad66d;
+            --warning-color: #f8961e;
+            --danger-color: #ef233c;
+            --truck-color: #f72585;
+            --driver-color: #7209b7;
+            --package-color: #3a86ff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            color: var(--dark-color);
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #030303, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .back-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .trip-form-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--dark-color);
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-select, .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .capacity-info {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .packages-list {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 1rem;
+        }
+
+        .package-item {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .package-item:last-child {
+            border-bottom: none;
+        }
+
+        .package-checkbox {
+            margin-right: 1rem;
+        }
+
+        .package-info {
+            flex-grow: 1;
+        }
+
+        .package-name {
+            font-weight: 500;
+        }
+
+        .package-details {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.2rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background-color: #3aac5a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .submit-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .trip-document {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: none;
+            margin-top: 2rem;
+        }
+
+        .document-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 1rem;
+        }
+
+        .document-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .document-date {
+            color: #666;
+        }
+
+        .document-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .driver-info, .truck-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: #666;
+        }
+
+        .info-value {
+            font-weight: 500;
+        }
+
+        .packages-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .packages-table th, .packages-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .packages-table th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .packages-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .print-btn {
+            display: block;
+            width: 200px;
+            margin: 2rem auto 0;
+            padding: 0.8rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .print-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <a href="/resregion" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1 class="page-title"><i class="fas fa-route"></i> Manage Trips</h1>
+        <div class="alert alert-danger" id="capacityAlert">
+            <i class="fas fa-exclamation-triangle"></i> 
+            <span id="alertMessage">The selected packages exceed the truck's capacity. Please adjust your selection.</span>
+        </div>
+
+        <div class="trip-form-container">
+            <h2 class="form-title">Create New Trip</h2>
+            
+            <div class="form-group">
+                <label for="driver" class="form-label">Select Driver</label>
+                <select id="driver" class="form-select">
+                    <option value="">-- Select Driver --</option>
+                    <% driverst.forEach(driver => { %>
+                        <option value="<%= driver.id %>">
+                            <%= driver.full_name %> (License: <%= driver.id %>)
+                        </option>
+                    <% }); %>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="truck" class="form-label">Select Truck</label>
+                <select id="truck" class="form-select">
+                    <option value="">-- Select Truck --</option>
+                    <% truckst.forEach(truck => { %>
+                        <option value="<%= truck.id %>" 
+                                data-max-weight="<%= truck.max_weight %>" 
+                                data-max-volume="<%= truck.max_volume %>">
+                            <%= truck.make_model %> (Plate: <%= truck.plate_number %>) - 
+                            Capacity: <%= truck.max_weight.toLocaleString() %>kg / 
+                            <%= truck.max_volume.toLocaleString() %>cm³
+                        </option>
+                    <% }); %>
+                </select>
+                <div class="capacity-info">
+                    <span id="weightInfo">Max Weight: 0kg</span>
+                    <span id="volumeInfo">Max Volume: 0cm³</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Select Packages</label>
+                <div class="packages-list">
+                    <% packages.forEach(pkg => { %>
+                        <div class="package-item">
+                            <input type="checkbox" class="package-checkbox" id="pkg<%= pkg.id %>" 
+                                   value="<%= pkg.id %>" 
+                                   data-weight="<%= pkg.weight %>" 
+                                   data-volume="<%= pkg.volume %>"
+                                   data-name="<%= pkg.full_name %>"
+                                   data-source="<%= pkg.source %>"
+                                   data-type="<%= pkg.product_type_id %>"
+                                   data-destination="<%= pkg.destination %>">
+                            <div class="package-info">
+                                <div class="package-name">Package <%= pkg.id %></div>
+                                <div class="package-details">
+                                    Name: <%= pkg.full_name %> | 
+                                    Source: <%= pkg.source %> | 
+                                    Destination: <%= pkg.destination %> | 
+                                    Weight: <%= pkg.weight.toLocaleString() %>kg | 
+                                    Volume: <%= pkg.volume.toLocaleString() %>cm³ |
+                                    Type: <%= pkg.product_type_id %>
+                                </div>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            </div>
+
+            <button id="generateBtn" class="submit-btn" disabled>
+                <i class="fas fa-file-alt"></i> Generate Trip Document
+            </button>
+        </div>
+
+        <div id="tripDocument" class="trip-document">
+            <div class="document-header">
+                <h2 class="document-title">Trip Assignment Document</h2>
+                <div class="document-date" id="documentDate"></div>
+            </div>
+
+            <div class="document-section">
+                <h3 class="section-title">Driver Information</h3>
+                <div class="driver-info">
+                    <div>
+                        <span class="info-label">Driver Name:</span>
+                        <span class="info-value" id="docDriverName"></span>
+                    </div>
+                    <div>
+                        <span class="info-label">License Number:</span>
+                        <span class="info-value" id="docDriverLicense"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="document-section">
+                <h3 class="section-title">Truck Information</h3>
+                <div class="truck-info">
+                    <div>
+                        <span class="info-label">Truck Model:</span>
+                        <span class="info-value" id="docTruckModel"></span>
+                    </div>
+                    <div>
+                        <span class="info-label">License Plate:</span>
+                        <span class="info-value" id="docTruckPlate"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="document-section">
+                <h3 class="section-title">Assigned Packages</h3>
+                <table class="packages-table">
+                    <thead>
+                        <tr>
+                            <th>Parcel ID</th>
+                            <th>Name</th>
+                            <th>Source</th>
+                            <th>Destination</th>
+                            <th>Weight (kg)</th>
+                            <th>Volume (cm³)</th>
+                            <th>Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="docPackagesList">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="document-section">
+                <h3 class="section-title">Summary</h3>
+                <div class="truck-info">
+                    <div>
+                        <span class="info-label">Total Packages:</span>
+                        <span class="info-value" id="docTotalPackages"></span>
+                    </div>
+                    <div>
+                        <span class="info-label">Total Weight:</span>
+                        <span class="info-value" id="docTotalWeight"></span>
+                    </div>
+                    <div>
+                        <span class="info-label">Total Volume:</span>
+                        <span class="info-value" id="docTotalVolume"></span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="#" class="print-btn" id="printBtn">
+                <i class="fas fa-print"></i> Print Document
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Truck capacity tracking variables
+        let maxWeight = 0;
+        let maxVolume = 0;
+        let currentWeight = 0;
+        let currentVolume = 0;
+        let selectedTruckId = null;
+
+        // DOM elements
+        const truckSelect = document.getElementById('truck');
+        const weightInfo = document.getElementById('weightInfo');
+        const volumeInfo = document.getElementById('volumeInfo');
+        const packageCheckboxes = document.querySelectorAll('.package-checkbox');
+        const generateBtn = document.getElementById('generateBtn');
+        const capacityAlert = document.getElementById('capacityAlert');
+        const alertMessage = document.getElementById('alertMessage');
+
+        // Initialize truck selection
+        truckSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            
+            if (selectedOption.value) {
+                maxWeight = parseInt(selectedOption.dataset.maxWeight);
+                maxVolume = parseInt(selectedOption.dataset.maxVolume);
+                selectedTruckId = selectedOption.value;
+                
+                weightInfo.textContent = `Max Weight: ${maxWeight.toLocaleString()}kg`;
+                volumeInfo.textContent = `Max Volume: ${maxVolume.toLocaleString()}cm³`;
+                
+                // Reset package selections when truck changes
+                packageCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                currentWeight = 0;
+                currentVolume = 0;
+                updateCapacityInfo();
+                checkSubmitButton();
+                capacityAlert.style.display = 'none';
+            } else {
+                maxWeight = 0;
+                maxVolume = 0;
+                selectedTruckId = null;
+                weightInfo.textContent = 'Max Weight: 0kg';
+                volumeInfo.textContent = 'Max Volume: 0cm³';
+                updateCapacityInfo();
+                checkSubmitButton();
+            }
+        });
+
+        // Package selection handler
+        packageCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const weight = parseInt(this.dataset.weight);
+                const volume = parseInt(this.dataset.volume);
+                
+                if (this.checked) {
+                    currentWeight += weight;
+                    currentVolume += volume;
+                } else {
+                    currentWeight -= weight;
+                    currentVolume -= volume;
+                }
+                
+                updateCapacityInfo();
+                checkSubmitButton();
+            });
+        });
+
+        // Update capacity information
+        function updateCapacityInfo() {
+            weightInfo.textContent = `Weight: ${currentWeight.toLocaleString()}kg / ${maxWeight.toLocaleString()}kg`;
+            volumeInfo.textContent = `Volume: ${currentVolume.toLocaleString()}cm³ / ${maxVolume.toLocaleString()}cm³`;
+            
+            // Show warning if capacity exceeded
+            if (currentWeight > maxWeight || currentVolume > maxVolume) {
+                const exceeded = [];
+                if (currentWeight > maxWeight) exceeded.push(`${currentWeight - maxWeight}kg over weight limit`);
+                if (currentVolume > maxVolume) exceeded.push(`${currentVolume - maxVolume}cm³ over volume limit`);
+                alertMessage.textContent = `The selected packages exceed the truck's capacity (${exceeded.join(' and ')}). Please adjust your selection.`;
+                capacityAlert.style.display = 'block';
+            } else {
+                capacityAlert.style.display = 'none';
+            }
+        }
+
+        // Enable/disable submit button based on validation
+        function checkSubmitButton() {
+            const driverSelected = document.getElementById('driver').value !== '';
+            const truckSelected = selectedTruckId !== null;
+            const packagesSelected = currentWeight > 0 && currentVolume > 0;
+            const withinCapacity = currentWeight <= maxWeight && currentVolume <= maxVolume;
+            
+            generateBtn.disabled = !(driverSelected && truckSelected && packagesSelected && withinCapacity);
+        }
+
+        // Generate document
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            // Validate capacity one more time
+            if (currentWeight > maxWeight || currentVolume > maxVolume) {
+                alert('Cannot generate document - capacity exceeded');
+                return;
+            }
+            
+            // Get selected driver
+            const driverSelect = document.getElementById('driver');
+            const selectedDriver = driverSelect.options[driverSelect.selectedIndex];
+            
+            // Get selected truck
+            const truckSelect = document.getElementById('truck');
+            const selectedTruck = truckSelect.options[truckSelect.selectedIndex];
+            
+            // Extract driver info (name and license)
+            const driverText = selectedDriver.text;
+            const driverParts = driverText.split('(');
+            const driverName = driverParts[0].trim();
+            const driverLicense = driverParts[1].replace('License: ', '').replace(')', '');
+            
+            // Extract truck info (model and plate)
+            const truckText = selectedTruck.text;
+            const truckParts = truckText.split('(');
+            const truckModel = truckParts[0].trim();
+            const truckPlate = truckParts[1].replace('Plate: ', '').replace(')', '');
+            
+            // Process packages
+            let packages = [];
+            let totalWeight = 0;
+            let totalVolume = 0;
+            
+            packageCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    packages.push({
+                        id: checkbox.value,
+                        name: checkbox.dataset.name,
+                        source: checkbox.dataset.source,
+                        destination: checkbox.dataset.destination,
+                        weight: parseInt(checkbox.dataset.weight),
+                        volume: parseInt(checkbox.dataset.volume),
+                        type: checkbox.dataset.type
+                    });
+                    
+                    totalWeight += parseInt(checkbox.dataset.weight);
+                    totalVolume += parseInt(checkbox.dataset.volume);
+                }
+            });
+            
+            // Update document with the collected information
+            document.getElementById('docDriverName').textContent = driverName;
+            document.getElementById('docDriverLicense').textContent = driverLicense;
+            document.getElementById('docTruckModel').textContent = truckModel;
+            document.getElementById('docTruckPlate').textContent = truckPlate;
+            
+            // Format today's date
+            const today = new Date();
+            const formattedDate = today.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('documentDate').textContent = `Generated on: ${formattedDate}`;
+            
+            // Populate packages table
+            const packagesList = document.getElementById('docPackagesList');
+            packagesList.innerHTML = '';
+            
+            packages.forEach(pkg => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${pkg.id}</td>
+                    <td>${pkg.name || 'N/A'}</td>
+                    <td>${pkg.source || 'N/A'}</td>
+                    <td>${pkg.destination || 'N/A'}</td>
+                    <td>${pkg.weight.toLocaleString()}</td>
+                    <td>${pkg.volume.toLocaleString()}</td>
+                    <td>${pkg.product_type_id || 'N/A'}</td>
+                `;
+                packagesList.appendChild(row);
+            });
+            
+            // Update summary
+            document.getElementById('docTotalPackages').textContent = packages.length;
+            document.getElementById('docTotalWeight').textContent = `${totalWeight.toLocaleString()} kg`;
+            document.getElementById('docTotalVolume').textContent = `${totalVolume.toLocaleString()} cm³`;
+            
+            // Show the document
+            document.getElementById('tripDocument').style.display = 'block';
+            
+            // Scroll to document
+            document.getElementById('tripDocument').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        // Print functionality
+        document.getElementById('printBtn').addEventListener('click', function() {
+            const printContent = document.getElementById('tripDocument').innerHTML;
+            const originalContent = document.body.innerHTML;
+            
+            document.body.innerHTML = printContent;
+            window.print();
+            document.body.innerHTML = originalContent;
+            
+            // Re-attach event listeners
+            document.getElementById('printBtn').addEventListener('click', arguments.callee);
+            document.getElementById('generateBtn').addEventListener('click', arguments.callee);
+        });
+    </script>
+</body>
+</html>
