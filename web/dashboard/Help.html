@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="logopage.png">
+    <title>Delivery Service - Frequently Asked Questions</title>
+    <style>
+        :root {
+            --primary-color: #2c3E50;
+            --secondary-color: #3498db;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --medium-gray: #e0e0e0;
+            --dark-gray: #777;
+            --white: #fff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px 0;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .search-container {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid var(--medium-gray);
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #search-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 8px #3498db(46, 204, 113, 0.3);
+        }
+
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+
+        .category-tab {
+            padding: 10px 20px;
+            background-color: var(--white);
+            border: 1px solid var(--medium-gray);
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .category-tab:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+
+        .category-tab.active {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border-color: var(--primary-color);
+        }
+
+        .faq-section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--medium-gray);
+        }
+
+        .section-icon {
+            margin-right: 15px;
+            font-size: 24px;
+        }
+
+        .faq-item {
+            background-color: var(--white);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .faq-question:hover {
+            background-color: #3498db;
+        }
+
+        .faq-question::after {
+            content: '+';
+            font-size: 24px;
+            color: var(--dark-gray);
+            transition: transform 0.3s;
+        }
+
+        .faq-item.active .faq-question::after {
+            content: '-';
+        }
+
+        .faq-answer {
+            padding: 0 20px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+            border-top: 1px solid transparent;
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 10px 20px 20px;
+            max-height: 500px;
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: var(--dark-gray);
+            border-top: 1px solid var(--medium-gray);
+        }
+
+        @media (max-width: 768px) {
+            .category-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .category-tab {
+                width: 100%;
+                text-align: center;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <header>
+        <h1>Frequently Asked Questions</h1>
+        <p>Find answers to common questions about our delivery services</p>
+    </header>
+
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Search questions...">
+    </div>
+
+    <div class="category-tabs">
+        <div class="category-tab active" data-category="all">All Questions</div>
+        <div class="category-tab" data-category="general">General Information</div>
+        <div class="category-tab" data-category="shipping">Shipping & Delivery</div>
+        <div class="category-tab" data-category="pricing">Pricing & Payment</div>
+        <div class="category-tab" data-category="packaging">Packaging & Restrictions</div>
+        <div class="category-tab" data-category="issues">Issues & Complaints</div>
+    </div>
+
+    <div class="no-results">
+        <h3>No questions found matching your search</h3>
+        <p>Try different keywords or browse the categories above</p>
+    </div>
+
+    <div class="faq-container">
+        <!-- General Information -->
+        <div class="faq-section" data-category="general">
+            <div class="section-title">
+                <span class="section-icon"><i class="fas fa-info-circle"></i></span>
+                <h2>General Information</h2>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What services do you offer?</div>
+                <div class="faq-answer">
+                    <p>We provide delivery services across all regions of Algeria, with a strong focus on speed and reliability.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Which areas do you cover?</div>
+                <div class="faq-answer">
+                    <p>We operate in all Algerian provinces without exception.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do you offer shipping services for individuals or only for businesses?</div>
+                <div class="faq-answer">
+                    <p>Our services are available to everyone — individuals, online stores, and companies.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do you have a mobile app?</div>
+                <div class="faq-answer">
+                    <p>Currently, we do not have a mobile app, but we are working on launching one soon to make tracking and service requests easier.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipping & Delivery -->
+        <div class="faq-section" data-category="shipping">
+            <div class="section-title">
+                <span class="section-icon"><i class="fas fa-truck"></i></span>
+                <h2>Shipping & Delivery</h2>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How long does delivery take?</div>
+                <div class="faq-answer">
+                    <p>Delivery usually takes between 1 to 3 days, depending on the destination.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I track my shipment?</div>
+                <div class="faq-answer">
+                    <p>Yes, we provide a tracking service. However, due to the short delivery distances, tracking may not always be very detailed.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do you offer cash on delivery (COD)?</div>
+                <div class="faq-answer">
+                    <p>Yes, we use the cash-on-delivery system, as it is safer and more convenient for both us and the customer.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I change the delivery address after the shipment is sent?</div>
+                <div class="faq-answer">
+                    <p>Yes, but you'll need to visit one of our branches or contact us directly to explain the situation.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Is same-day delivery available?</div>
+                <div class="faq-answer">
+                    <p>It depends on the destination and the availability of shipments at that time. We always aim to deliver as quickly as possible.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing & Payment -->
+        <div class="faq-section" data-category="pricing">
+            <div class="section-title">
+                <span class="section-icon"><i class="fas fa-dollar-sign"></i></span>
+                <h2>Pricing & Payment</h2>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">How much does shipping cost?</div>
+                <div class="faq-answer">
+                    <p>Shipping costs vary depending on the province. You can get an estimate when placing your order.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do you offer discounts for regular shipments or online stores?</div>
+                <div class="faq-answer">
+                    <p>Not yet, but we plan to introduce special offers and packages for online sellers very soon.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What payment methods are available?</div>
+                <div class="faq-answer">
+                    <p>All payments are made in cash upon delivery.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Packaging & Restrictions -->
+        <div class="faq-section" data-category="packaging">
+            <div class="section-title">
+                <span class="section-icon"><i class="fas fa-box-open"></i></span>
+                <h2>Packaging & Restrictions</h2>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Do I have to package the shipment myself?</div>
+                <div class="faq-answer">
+                    <p>Yes. Once you print the shipping label, you should package your item securely and attach the label clearly and visibly.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What items are prohibited from shipping?</div>
+                <div class="faq-answer">
+                    <p>We do not accept any illegal items such as drugs, tobacco, or hazardous materials.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Can I ship perishable items like food?</div>
+                <div class="faq-answer">
+                    <p>Yes, but we are not responsible for any damage or spoilage during transit.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Issues & Complaints -->
+        <div class="faq-section" data-category="issues">
+            <div class="section-title">
+                <span class="section-icon"><i class="fas fa-exclamation-triangle"></i></span>
+                <h2>Issues & Complaints</h2>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What should I do if my shipment is delayed?</div>
+                <div class="faq-answer">
+                    <p>You can visit the nearest branch or contact us directly for an update and clarification.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">What happens if my shipment gets lost or damaged?</div>
+                <div class="faq-answer">
+                    <p>We always do our best to prevent such incidents. However, if they occur, we take full responsibility and offer compensation based on the value of the shipment.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // FAQ toggle functionality
+            const faqItems = document.querySelectorAll('.faq-item');
+
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question');
+
+                question.addEventListener('click', () => {
+                    // Close all other items
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item && otherItem.classList.contains('active')) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+
+                    // Toggle current item
+                    item.classList.toggle('active');
+                });
+            });
+
+            // Category filter functionality
+            const categoryTabs = document.querySelectorAll('.category-tab');
+
+            categoryTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Update active tab
+                    categoryTabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const category = tab.dataset.category;
+                    const faqSections = document.querySelectorAll('.faq-section');
+                    let visibleSections = 0;
+
+                    // Show/hide sections based on category
+                    faqSections.forEach(section => {
+                        if (category === 'all' || section.dataset.category === category) {
+                            section.style.display = 'block';
+                            visibleSections++;
+                        } else {
+                            section.style.display = 'none';
+                        }
+
+                        // Close all questions when switching categories
+                        section.querySelectorAll('.faq-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                    });
+
+                    // Show no results message if no sections match
+                    const noResults = document.querySelector('.no-results');
+                    if (visibleSections === 0) {
+                        noResults.style.display = 'block';
+                    } else {
+                        noResults.style.display = 'none';
+                    }
+                });
+            });
+
+            // Search functionality
+            const searchInput = document.getElementById('search-input');
+
+            searchInput.addEventListener('input', () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const faqQuestions = document.querySelectorAll('.faq-question');
+                let visibleQuestions = 0;
+
+                if (searchTerm.length === 0) {
+                    // Reset view if search is empty
+                    document.querySelectorAll('.faq-section').forEach(section => {
+                        section.style.display = 'block';
+                    });
+
+                    document.querySelectorAll('.faq-item').forEach(item => {
+                        item.style.display = 'block';
+                    });
+
+                    document.querySelector('.no-results').style.display = 'none';
+                    return;
+                }
+
+                // Search through questions
+                faqQuestions.forEach(question => {
+                    const questionText = question.textContent.toLowerCase();
+                    const faqItem = question.closest('.faq-item');
+                    const faqSection = question.closest('.faq-section');
+
+                    if (questionText.includes(searchTerm)) {
+                        faqItem.style.display = 'block';
+                        faqSection.style.display = 'block';
+                        visibleQuestions++;
+                    } else {
+                        faqItem.style.display = 'none';
+                    }
+                });
+
+                // Hide sections with no visible questions
+                document.querySelectorAll('.faq-section').forEach(section => {
+                    const hasVisibleItems = Array.from(section.querySelectorAll('.faq-item')).some(
+                        item => window.getComputedStyle(item).display !== 'none'
+                    );
+
+                    if (!hasVisibleItems) {
+                        section.style.display = 'none';
+                    }
+                });
+
+                // Show no results message if no questions match
+                const noResults = document.querySelector('.no-results');
+                if (visibleQuestions === 0) {
+                    noResults.style.display = 'block';
+                } else {
+                    noResults.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
