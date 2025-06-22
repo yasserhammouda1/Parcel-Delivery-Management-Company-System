@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Management System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --success-color: #4ad66d;
+            --warning-color: #f8961e;
+            --danger-color: #ef233c;
+            --delivery-color: #7209b7;
+            --stats-color: #4895ef;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            color: var(--dark-color);
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #030303, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+
+        .logout-btn {
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+       .cards-container {
+       display: flex;
+       justify-content: center;
+       flex-wrap: wrap;
+       gap: 2rem;
+       margin-bottom: 3rem;
+       }
+
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 250px;
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .card:nth-child(1) .card-icon { color: var(--success-color); }
+        .card:nth-child(2) .card-icon { color: var(--primary-color); }
+        .card:nth-child(3) .card-icon { color: var(--warning-color); }
+        .card:nth-child(4) .card-icon { color: var(--danger-color); }
+        .card:nth-child(5) .card-icon { color: var(--delivery-color); }
+        .card:nth-child(6) .card-icon { color: var(--stats-color); }
+
+        .section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .date-filter div {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .date-filter label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .date-filter input {
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .filter-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.3s;
+        }
+
+        .filter-btn:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+            border-top: 4px solid var(--stats-color);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.income {
+            border-top-color: var(--success-color);
+        }
+
+        .stat-card.shipping {
+            border-top-color: var(--warning-color);
+        }
+
+        .stat-card.delivery {
+            border-top-color: var(--danger-color);
+        }
+
+        .stat-title {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .stat-card.income .stat-value {
+            color: var(--success-color);
+        }
+
+        .stat-card.shipping .stat-value {
+            color: var(--warning-color);
+        }
+
+        .stat-card.delivery .stat-value {
+            color: var(--danger-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card:nth-child(1) { animation: fadeIn 0.5s ease-in-out 0.1s forwards; opacity: 0; }
+        .card:nth-child(2) { animation: fadeIn 0.5s ease-in-out 0.2s forwards; opacity: 0; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <div class="logo-container">
+                <img src="../logo-2_1.svg" alt="Company Logo" class="logo">
+            </div>
+             <a href="/logout" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </header>
+
+        <div class="cards-container">
+            <div class="card" onclick="navigateTo('/employees')">
+                <div class="card-icon">
+                    <i class="fas fa-users-cog"></i>
+                </div>
+                <h3 class="card-title">Manage Employees</h3>
+                <p class="card-desc">Add and edit employee information</p>
+            </div>
+
+            <div class="card" onclick="navigateTo('/drivers')">
+                <div class="card-icon">
+                    <i class="fas fa-motorcycle"></i>
+                </div>
+                <h3 class="card-title">Manage Drivers</h3>
+                <p class="card-desc">Add and edit motorcycle driver information</p>
+            </div>
+        </div>
+
+        <!-- Statistics Section -->
+        <div class="section">
+            <h2 class="section-title">
+                <span>Delivery Statistics</span>
+                <div class="date-filter">
+                    <div>
+                        <label for="startDate">From Date</label>
+                        <input type="date" id="startDate" value="<%= new Date().toISOString().split('T')[0] %>">
+                    </div>
+                    <div>
+                        <label for="endDate">To Date</label>
+                        <input type="date" id="endDate" value="<%= new Date().toISOString().split('T')[0] %>">
+                    </div>
+                    <button class="filter-btn" onclick="applyDateFilter()">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </h2>
+            <div class="stats-container">
+                <div class="stat-card income">
+                    <div class="stat-title">
+                        <i class="fas fa-money-bill-wave"></i> Daily Income from Parcels
+                    </div>
+                    <div class="stat-value Total-Amount"><%= TotalAmount %></div>
+                </div>
+                <div class="stat-card shipping">
+                    <div class="stat-title">
+                        <i class="fas fa-box-open"></i> Parcels Ready for Shipping
+                    </div>
+                    <div class="stat-value Parcels-For-Shipping"><%= ParcelsForShipping %></div>
+                </div>
+                <div class="stat-card delivery">
+                    <div class="stat-title">
+                        <i class="fas fa-truck"></i> Prcels Ready for Delivery
+                    </div>
+                    <div class="stat-value Parcels-For-Delivery"><%= ParcelsForDelivery %></div>
+                </div>
+            </div>
+        </div>        
+    </div>
+
+    <script>
+        // Navigation function
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                await fetch("/logout", {
+                    method: "POST"
+                });
+                
+                window.location.href = "/login.html";
+
+            } catch (error) {
+                console.error("Error during logout:", error);
+                alert("An error occurred during logout. Please try again.");
+            }
+        }
+
+
+        function applyDateFilter() {
+        const start = document.getElementById("startDate").value;
+        const end = document.getElementById("endDate").value;
+        if (!start || !end) {
+            alert('Please select both start and end dates');
+            return;
+        }
+
+        fetch('/filter/date', {
+        method: 'POST',
+        headers: {
+        'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ startDate: start, endDate: end })
+        })
+        .then(response => response.json())
+                .then(data => {
+                    // Update the statistics cards with the new data
+                    document.querySelector('.Total-Amount').textContent = data.TotalAmount;
+                    document.querySelector('.Parcels-For-Shipping').textContent = data.ParcelsForShipping;
+                    document.querySelector('.Parcels-For-Delivery').textContent = data.ParcelsForDelivery;
+                })
+                .catch(error => {
+                    alert('Failed to load statistics. Please try again.');
+                });
+        }
+
+        // Initialize with today's date if no dates are specified
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const startDate = urlParams.get('startDate');
+            const endDate = urlParams.get('endDate');
+            
+            if (startDate) {
+                document.getElementById('startDate').value = startDate;
+            }
+            if (endDate) {
+                document.getElementById('endDate').value = endDate;
+            }
+        });
+    </script>
+</body>
+</html>
