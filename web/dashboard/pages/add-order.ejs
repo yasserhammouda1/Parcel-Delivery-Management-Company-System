@@ -1,0 +1,2029 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Order</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      :root {
+        --primary-color: #2c3e50;
+        --secondary-color: #3498db;
+        --accent-color: #e74c3c;
+      }
+
+      body {
+        background-color: #f8f9fa;
+        background-image: linear-gradient(
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.9)
+          ),
+          url("https://images.unsplash.com/photo-1601050690597-df0568f70950?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80");
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        color: var(--primary-color);
+      }
+
+      .navbar-brand img,
+      .col-md-4 img {
+        height: 40px;
+        margin-right: 10px;
+      }
+
+      .card {
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .card-header {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        padding: 1.5rem;
+      }
+
+      .required-field::after {
+        content: " *";
+        color: var(--accent-color);
+      }
+
+      .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+        color: var(--primary-color);
+        border-bottom: 2px solid var(--secondary-color);
+        padding-bottom: 0.3rem;
+      }
+
+      .btn-primary {
+        background-color: var(--secondary-color);
+        border-color: var(--secondary-color);
+        font-weight: 500;
+      }
+
+      .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+      }
+
+      .input-group-text {
+        background-color: #e9ecef;
+        color: var(--primary-color);
+      }
+
+      .invalid-feedback {
+        color: var(--accent-color);
+      }
+
+      footer {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 1rem 0;
+        margin-top: 2rem;
+      }
+
+      .form-control:focus,
+      .form-select:focus {
+        border-color: var(--secondary-color);
+        box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
+      }
+
+      /* Step navigation */
+      .step-nav {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+      }
+
+      .step {
+        text-align: center;
+        flex: 1;
+        position: relative;
+      }
+
+      .step-number {
+        width: 40px;
+        height: 40px;
+        background-color: #ddd;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.5rem;
+        font-weight: bold;
+        color: #666;
+      }
+
+      .step.active .step-number {
+        background-color: var(--secondary-color);
+        color: white;
+      }
+
+      .step.completed .step-number {
+        background-color: #2ecc71;
+        color: white;
+      }
+
+      .step-title {
+        font-size: 0.9rem;
+        color: #666;
+      }
+
+      .step.active .step-title {
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+
+      .step.completed .step-title {
+        color: #2ecc71;
+      }
+
+      /* Hide steps by default */
+      .form-step {
+        display: none;
+      }
+
+      .form-step.active {
+        display: block;
+      }
+
+      /* Order summary */
+      .order-summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .order-summary-total {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: var(--primary-color);
+      }
+
+      /* Print section */
+      #print-section {
+        display: none;
+        margin-top: 2rem;
+        padding: 2rem;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      #order-summary-image {
+        max-width: 100%;
+        border: 1px solid #eee;
+        margin-top: 1rem;
+      }
+
+      /* Print section styles */
+      .print-section {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      .print-header {
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .print-body h4 {
+        color: #2c3e50;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.5rem;
+        margin-top: 1.5rem;
+      }
+
+      .total-amount {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+
+      .signature-area {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 1px dashed #ccc;
+      }
+
+      @media print {
+        body * {
+          visibility: hidden;
+        }
+        .print-section,
+        .print-section * {
+          visibility: visible;
+        }
+        .print-section {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          box-shadow: none;
+        }
+      }
+      /* === Universal Enhancements for Cross-Device Compatibility === */
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+
+      body {
+        padding-top: 70px;
+        background-color: var(--content-bg);
+      }
+
+      .top-nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        background-color: white;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 15px;
+        z-index: 1000;
+      }
+
+      .top-nav-left img {
+        height: 35px;
+        max-width: 120px;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+      }
+
+      .balance-display {
+        display: flex;
+        align-items: center;
+        background-color: #f3f4f6;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 14px;
+      }
+
+      .balance-label {
+        margin-right: 6px;
+        color: #4b5563;
+      }
+
+      .balance-amount {
+        font-weight: 600;
+      }
+
+      .new-order-btn {
+        display: flex;
+        align-items: center;
+        background-color: #2c3e50;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.2s;
+      }
+
+      .new-order-btn span {
+        display: none;
+      }
+
+      .notification-container {
+        position: relative;
+      }
+
+      .notification-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        padding: 5px;
+        font-size: 0;
+      }
+
+      .notification-btn i {
+        font-size: 1.2rem;
+      }
+
+      .notification-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 8px;
+        height: 8px;
+        background-color: var(--accent-color);
+        border-radius: 50%;
+      }
+
+      .notification-dropdown {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        width: 280px;
+        max-width: 90vw;
+        background-color: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        padding: 10px 0;
+        display: none;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+
+      .notification-dropdown.show {
+        display: block;
+      }
+
+      .notification-item {
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .notification-item:last-child {
+        border-bottom: none;
+      }
+
+      .notification-title {
+        font-weight: 600;
+        margin-bottom: 3px;
+        font-size: 0.95rem;
+      }
+
+      .notification-message {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 3px;
+      }
+
+      .notification-time {
+        font-size: 0.75rem;
+        color: #999;
+      }
+
+      .account-dropdown-container {
+        position: relative;
+      }
+
+      .account-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 5px;
+      }
+
+      .account-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .account-dropdown {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        width: 180px;
+        background-color: white;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        border-radius: 4px;
+        padding: 10px 0;
+        display: none;
+      }
+
+      .account-dropdown.show {
+        display: block;
+      }
+
+      .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 15px;
+        text-decoration: none;
+        color: #333;
+        font-size: 0.9rem;
+      }
+
+      .dropdown-item:hover {
+        background-color: #f5f5f5;
+      }
+
+      .dropdown-icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      .mobile-menu-btn {
+        display: none;
+        position: fixed;
+        top: 80px;
+        left: 15px;
+        background: var(--sidebar-bg);
+        color: white;
+        border: none;
+        font-size: 1.5rem;
+        padding: 10px;
+        border-radius: 4px;
+        z-index: 1000;
+        cursor: pointer;
+      }
+
+      .sidebar {
+        width: var(--sidebar-width);
+        height: calc(100vh - 70px);
+        background: var(--sidebar-bg);
+        color: rgb(255, 255, 255);
+        position: fixed;
+        padding: 20px 0;
+        transition: transform 0.3s ease;
+        z-index: 999;
+        top: 70px;
+      }
+
+      .sidebar-header {
+        padding: 0 20px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        margin-bottom: 20px;
+      }
+      header {
+        min-height: 0px;
+      }
+
+      .sidebar-menu {
+        list-style: none;
+      }
+
+      .menu-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.95rem;
+      }
+
+      .menu-item:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+
+      .menu-item.active {
+        background-color: rgb(255, 255, 255);
+        border-radius: 20px;
+        color: black;
+      }
+
+      .menu-item i {
+        width: 20px;
+        text-align: center;
+      }
+
+      .main-content {
+        margin-left: var(--sidebar-width);
+        padding: 20px;
+        transition: margin 0.3s ease;
+      }
+
+      .content-section {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        display: none;
+        margin-bottom: 20px;
+      }
+
+      .content-section.active {
+        display: block;
+        animation: fadeIn 0.5s;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .section-title {
+        margin-bottom: 15px;
+        color: #2c3e50;
+        font-size: 1.3rem;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+        position: relative;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #555;
+        font-size: 0.95rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 0.95rem;
+        transition: border 0.3s;
+      }
+
+      .form-control:focus {
+        border-color: var(--primary-color);
+        outline: none;
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 10px;
+        top: 35px;
+        cursor: pointer;
+        color: #777;
+        font-size: 1rem;
+      }
+
+      .note {
+        font-size: 0.8rem;
+        color: var(--accent-color);
+        margin-top: 5px;
+        font-style: italic;
+      }
+
+      .alert {
+        padding: 12px;
+        border-radius: 4px;
+        margin-bottom: 15px;
+        font-size: 0.9rem;
+      }
+
+      .alert-warning {
+        background: #fff3cd;
+        color: #856404;
+        border-left: 4px solid #ffeeba;
+      }
+
+      .btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        transition: all 0.3s;
+      }
+
+      .btn-primary {
+        background: var(--primary-color);
+        color: white;
+      }
+
+      .btn-primary:hover {
+        background: #2980b9;
+      }
+
+      .btn-danger {
+        background: var(--accent-color);
+        color: white;
+      }
+
+      .btn-danger:hover {
+        background: #c0392b;
+      }
+
+      /* Responsive Media Queries - Updated for Better Mobile Compatibility */
+      /* ===== Media Queries - Merged & Optimized ===== */
+
+      /* Common styles for all screen sizes */
+      .top-nav {
+        height: 60px;
+        padding: 0 15px;
+      }
+
+      .balance-display {
+        display: flex;
+      }
+
+      /* Large devices (1025px and up) */
+      @media (min-width: 1025px) {
+        .sidebar {
+          width: 250px;
+          height: calc(100vh - 70px);
+          transform: none;
+        }
+        .main-content {
+          margin-left: 250px;
+        }
+        .new-order-btn span {
+          display: inline;
+        }
+      }
+
+      /* Medium devices (641px to 1024px) */
+      @media (max-width: 1024px) {
+        header {
+          min-height: 110px;
+        }
+        .sidebar {
+          transform: translateX(-100%);
+          width: 280px;
+          height: 100vh;
+          top: 60px;
+          z-index: 1000;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main-content {
+          margin-left: 0;
+          padding: 15px;
+        }
+        .mobile-menu-btn {
+          display: block;
+          top: 70px;
+          left: 15px;
+          z-index: 1001;
+        }
+        body {
+          padding-top: 100px;
+        }
+        .nav-right {
+          gap: 8px;
+        }
+        .new-order-btn {
+          padding: 6px;
+          width: 36px;
+          height: 36px;
+          justify-content: center;
+        }
+        .new-order-btn span {
+          display: none;
+        }
+        .account-avatar {
+          width: 28px;
+          height: 28px;
+        }
+        .notification-dropdown,
+        .account-dropdown {
+          right: -20px;
+        }
+        .notification-dropdown {
+          width: 280px;
+          max-width: 90vw;
+        }
+      }
+
+      /* Special cases for medium devices */
+      @media (min-width: 641px) and (max-width: 1024px) {
+        .balance-display {
+          display: flex !important;
+        }
+      }
+      @media (min-width: 641px) and (max-width: 768px) {
+        header {
+          min-height: 120px;
+        }
+      }
+
+      /* Small devices (480px and below) */
+      @media (max-width: 480px) {
+        header {
+          min-height: 120px;
+        }
+        .top-nav {
+          padding: 0 8px;
+        }
+        .nav-right {
+          gap: 5px;
+        }
+        .new-order-btn {
+          padding: 5px;
+          width: 34px;
+          height: 34px;
+        }
+        .account-avatar {
+          width: 26px;
+          height: 26px;
+        }
+        .content-section {
+          padding: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top-nav">
+      <div class="top-nav-left">
+        <a href="/dashboard">
+          <img src="logo-2_1.svg" alt="Logo" />
+        </a>
+      </div>
+      <div class="nav-right">
+        <div class="balance-display" id="balanceDisplay">
+          <span class="balance-label">Balance:</span>
+          <span class="balance-amount">$<%= balance %> DA</span>
+        </div>
+        <button class="new-order-btn" id="newOrderBtn">
+          <i data-lucide="plus" class="new-order-icon"></i>
+          <span>New Order</span>
+        </button>
+        <div class="notification-container">
+          <button class="notification-btn" id="notificationBtn">
+            <i data-lucide="bell"></i>
+            <% if (hasUnread) { %>
+            <span class="notification-badge"></span>
+            <% } %>
+          </button>
+
+          <div class="notification-dropdown" id="notificationDropdown">
+            <% if (notifications.length > 0) { %> <%
+            notifications.forEach(notification => { %>
+            <div class="notification-item">
+              <div class="notification-title"><%= notification.title %></div>
+              <div class="notification-message">
+                <%= notification.message %>
+              </div>
+              <div class="notification-time"><%= notification.date %></div>
+            </div>
+            <% }); %> <% } else { %>
+            <div class="notification-item">
+              <div class="notification-message">No new notifications</div>
+            </div>
+            <% } %>
+          </div>
+        </div>
+        <div class="account-dropdown-container">
+          <button class="account-btn" id="accountBtn">
+            <div class="account-avatar">
+              <i data-lucide="user"></i>
+            </div>
+          </button>
+          <div class="account-dropdown" id="accountDropdown">
+            <a href="#" class="dropdown-item">
+              <i data-lucide="settings" class="dropdown-icon"></i>
+              <span>Settings</span>
+            </a>
+            <a href="/help" class="dropdown-item">
+              <i data-lucide="help-circle" class="dropdown-icon"></i>
+              <span>Help</span>
+            </a>
+            <a href="#" class="dropdown-item">
+              <i data-lucide="log-out" class="dropdown-icon"></i>
+              <span>Log Out</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-10">
+          <!-- Step Navigation -->
+          <div class="step-nav mb-4">
+            <div class="step active" id="step1-indicator">
+              <div class="step-number">1</div>
+              <div class="step-title">Order Details</div>
+            </div>
+            <div class="step" id="step2-indicator">
+              <div class="step-number">2</div>
+              <div class="step-title">Print</div>
+            </div>
+          </div>
+
+          <div class="card shadow-lg">
+            <div class="card-header text-white">
+              <div class="d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">
+                  <i class="fas fa-plus-circle me-2"></i> Add New Order
+                </h2>
+                <span class="badge bg-light text-dark" id="step-badge"
+                  >Step 1 of 2</span
+                >
+              </div>
+            </div>
+            <div class="card-body p-4">
+              <form id="orderForm" novalidate>
+                <!-- Step 1: Order Details -->
+                <div class="form-step active" id="step1">
+                  <div class="row g-3">
+                    <!-- Product Information -->
+                    <div class="form-section-title">
+                      <i class="fas fa-box me-2"></i>Product Information
+                    </div>
+                    <div class="col-md-6">
+                      <label for="productName" class="form-label required-field"
+                        >Product Name</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-tag"></i
+                        ></span>
+                        <input
+                          type="text"
+                          id="productName"
+                          name="productName"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                      <div class="invalid-feedback">
+                        Please enter the product name.
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="productType" class="form-label required-field"
+                        >Product Type</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-boxes-stacked"></i
+                        ></span>
+                        <select
+                          id="productType"
+                          name="productType"
+                          class="form-select"
+                          required
+                        >
+                          <option value="" disabled selected>
+                            Select product type
+                          </option>
+                          <option value="Furniture">Furniture</option>
+                          <option value="Fragile">Fragile Items</option>
+                          <option value="Electronics">Electronics</option>
+                          <option value="Clothing">Clothing</option>
+                          <option value="Documents">Documents</option>
+                          <option value="Food">Food</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                      <div class="invalid-feedback">
+                        Please select product type.
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label for="quantity" class="form-label required-field"
+                        >Quantity</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-cubes"></i
+                        ></span>
+                        <input
+                          type="number"
+                          id="quantity"
+                          name="quantity"
+                          class="form-control"
+                          min="1"
+                          required
+                        />
+                      </div>
+                      <div class="invalid-feedback">
+                        Please enter a valid quantity.
+                      </div>
+                    </div>
+
+                    <!-- Package Details -->
+                    <div class="form-section-title">
+                      <i class="fas fa-weight-hanging me-2"></i>Package Details
+                    </div>
+                    <div class="col-md-4">
+                      <label for="weight" class="form-label required-field"
+                        >Weight</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-weight-scale"></i
+                        ></span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          id="weight"
+                          name="weight"
+                          class="form-control"
+                          required
+                        />
+                        <span class="input-group-text">kg</span>
+                      </div>
+                      <div class="invalid-feedback">
+                        Please enter weight (e.g. 2 or 2.5 kg).
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="volume" class="form-label">Volume</label>
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-arrows-up-down-left-right"></i
+                        ></span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          id="volume"
+                          name="volume"
+                          class="form-control"
+                        />
+                        <span class="input-group-text">cm³</span>
+                      </div>
+                      <div class="invalid-feedback">
+                        Please enter volume (e.g. 0.01 cm³).
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <label for="price" class="form-label required-field"
+                        >Price</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-money-bill-wave"></i
+                        ></span>
+                        <input
+                          type="number"
+                          step="0.01"
+                          id="price"
+                          name="price"
+                          class="form-control"
+                          required
+                        />
+                        <span class="input-group-text">DZD</span>
+                      </div>
+                      <div class="invalid-feedback">
+                        Please enter a valid price.
+                      </div>
+                    </div>
+
+                    <!-- Delivery Information -->
+                    <div class="form-section-title">
+                      <i class="fas fa-truck-fast me-2"></i>Delivery Information
+                    </div>
+                    <!-- بداية التعديل على القوائم المنسدلة -->
+                    <div class="col-md-6">
+                      <label
+                        for="startDestination"
+                        class="form-label required-field"
+                        >Origin</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-map-marker-alt"></i
+                        ></span>
+                        <select
+                          id="startDestination"
+                          name="startDestination"
+                          class="form-select"
+                          required
+                        >
+                        <option value="" disabled selected>
+                            Select Wilaya
+                          </option>
+                          <option value="Adrar">Adrar</option>
+                          <option value="Chlef">Chlef</option>
+                          <option value="Laghouat">Laghouat</option>
+                          <option value="Oum El Bouaghi">
+                            Oum El Bouaghi
+                          </option>
+                          <option value="Batna">Batna</option>
+                          <option value="Béjaïa">Béjaïa</option>
+                          <option value="Biskra">Biskra</option>
+                          <option value="Béchar">Béchar</option>
+                          <option value="Blida">Blida</option>
+                          <option value="Bouira">Bouira</option>
+                          <option value="Tamanrasset">Tamanrasset</option>
+                          <option value="Tébessa">Tébessa</option>
+                          <option value="Tlemcen">Tlemcen</option>
+                          <option value="Tiaret">Tiaret</option>
+                          <option value="Tizi Ouzou">Tizi Ouzou</option>
+                          <option value="Algiers">Algiers</option>
+                          <option value="Djelfa">Djelfa</option>
+                          <option value="Jijel">Jijel</option>
+                          <option value="Sétif">Sétif</option>
+                          <option value="Saïda">Saïda</option>
+                          <option value="Skikda">Skikda</option>
+                          <option value="Sidi Bel Abbès">
+                            Sidi Bel Abbès
+                          </option>
+                          <option value="Annaba">Annaba</option>
+                          <option value="Guelma">Guelma</option>
+                          <option value="Constantine">Constantine</option>
+                          <option value="Médéa">Médéa</option>
+                          <option value="Mostaganem">Mostaganem</option>
+                          <option value="MSila">MSila</option>
+                          <option value="Mascara">Mascara</option>
+                          <option value="Ouargla">Ouargla</option>
+                          <option value="Oran">Oran</option>
+                          <option value="El Bayadh">El Bayadh</option>
+                          <option value="Illizi">Illizi</option>
+                          <option value="Bordj Bou Arréridj">
+                            Bordj Bou Arréridj
+                          </option>
+                          <option value="Boumerdès">Boumerdès</option>
+                          <option value="El Tarf">El Tarf</option>
+                          <option value="Tindouf">Tindouf</option>
+                          <option value="Tissemsilt">Tissemsilt</option>
+                          <option value="El Oued">El Oued</option>
+                          <option value="Khenchela">Khenchela</option>
+                          <option value="Souk Ahras">Souk Ahras</option>
+                          <option value="Tipaza">Tipaza</option>
+                          <option value="Mila">Mila</option>
+                          <option value="Aïn Defla">Aïn Defla</option>
+                          <option value="Naâma">Naâma</option>
+                          <option value="Aïn Témouchent">
+                            Aïn Témouchent
+                          </option>
+                          <option value="Ghardaïa">Ghardaïa</option>
+                          <option value="Relizane">Relizane</option>
+                          <option value="Timimoun">Timimoun</option>
+                          <option value="Bordj Badji Mokhtar">
+                            Bordj Badji Mokhtar
+                          </option>
+                          <option value="Ouled Djellal">
+                            Ouled Djellal
+                          </option>
+                          <option value="Béni Abbès">Béni Abbès</option>
+                          <option value="In Salah">In Salah</option>
+                          <option value="In Guezzam">In Guezzam</option>
+                          <option value="Touggourt">Touggourt</option>
+                          <option value="Djanet">Djanet</option>
+                          <option value="El M'Ghair">El M'Ghair</option>
+                          <option value="El Menia">El Menia</option>
+                        </select>
+                      </div>
+                      <div class="invalid-feedback">
+                        Please select origin wilaya.
+                      </div>
+                    </div>
+
+                    <div class="col-md-6">
+                      <label
+                        for="endDestination"
+                        class="form-label required-field"
+                        >Destination</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-map-marker-alt"></i
+                        ></span>
+                        <select
+                          id="endDestination"
+                          name="endDestination"
+                          class="form-select"
+                          required
+                        >
+                          <option value="" disabled selected>
+                            Select Wilaya
+                          </option>
+                          <option value="Adrar">Adrar</option>
+                          <option value="Chlef">Chlef</option>
+                          <option value="Laghouat">Laghouat</option>
+                          <option value="Oum El Bouaghi">
+                            Oum El Bouaghi
+                          </option>
+                          <option value="Batna">Batna</option>
+                          <option value="Béjaïa">Béjaïa</option>
+                          <option value="Biskra">Biskra</option>
+                          <option value="Béchar">Béchar</option>
+                          <option value="Blida">Blida</option>
+                          <option value="Bouira">Bouira</option>
+                          <option value="Tamanrasset">Tamanrasset</option>
+                          <option value="Tébessa">Tébessa</option>
+                          <option value="Tlemcen">Tlemcen</option>
+                          <option value="Tiaret">Tiaret</option>
+                          <option value="Tizi Ouzou">Tizi Ouzou</option>
+                          <option value="Algiers">Algiers</option>
+                          <option value="Djelfa">Djelfa</option>
+                          <option value="Jijel">Jijel</option>
+                          <option value="Sétif">Sétif</option>
+                          <option value="Saïda">Saïda</option>
+                          <option value="Skikda">Skikda</option>
+                          <option value="Sidi Bel Abbès">
+                            Sidi Bel Abbès
+                          </option>
+                          <option value="Annaba">Annaba</option>
+                          <option value="Guelma">Guelma</option>
+                          <option value="Constantine">Constantine</option>
+                          <option value="Médéa">Médéa</option>
+                          <option value="Mostaganem">Mostaganem</option>
+                          <option value="MSila">MSila</option>
+                          <option value="Mascara">Mascara</option>
+                          <option value="Ouargla">Ouargla</option>
+                          <option value="Oran">Oran</option>
+                          <option value="El Bayadh">El Bayadh</option>
+                          <option value="Illizi">Illizi</option>
+                          <option value="Bordj Bou Arréridj">
+                            Bordj Bou Arréridj
+                          </option>
+                          <option value="Boumerdès">Boumerdès</option>
+                          <option value="El Tarf">El Tarf</option>
+                          <option value="Tindouf">Tindouf</option>
+                          <option value="Tissemsilt">Tissemsilt</option>
+                          <option value="El Oued">El Oued</option>
+                          <option value="Khenchela">Khenchela</option>
+                          <option value="Souk Ahras">Souk Ahras</option>
+                          <option value="Tipaza">Tipaza</option>
+                          <option value="Mila">Mila</option>
+                          <option value="Aïn Defla">Aïn Defla</option>
+                          <option value="Naâma">Naâma</option>
+                          <option value="Aïn Témouchent">
+                            Aïn Témouchent
+                          </option>
+                          <option value="Ghardaïa">Ghardaïa</option>
+                          <option value="Relizane">Relizane</option>
+                          <option value="Timimoun">Timimoun</option>
+                          <option value="Bordj Badji Mokhtar">
+                            Bordj Badji Mokhtar
+                          </option>
+                          <option value="Ouled Djellal">
+                            Ouled Djellal
+                          </option>
+                          <option value="Béni Abbès">Béni Abbès</option>
+                          <option value="In Salah">In Salah</option>
+                          <option value="In Guezzam">In Guezzam</option>
+                          <option value="Touggourt">Touggourt</option>
+                          <option value="Djanet">Djanet</option>
+                          <option value="El M'Ghair">El M'Ghair</option>
+                          <option value="El Menia">El Menia</option>
+                        </select>
+                      </div>
+                      <div class="invalid-feedback">
+                        Please select destination wilaya.
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-check mt-4">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="homeDeliveryCheckbox"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="homeDeliveryCheckbox"
+                        >
+                          <i class="fas fa-home me-2"></i>Home Delivery (+250
+                          DA)
+                        </label>
+                      </div>
+                      <div class="form-check mt-2">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="freeDeliveryCheckbox"
+                        />
+                        <label
+                          class="form-check-label"
+                          for="freeDeliveryCheckbox"
+                        >
+                          <i class="fas fa-truck me-2"></i>Free Delivery
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label
+                        for="deliveryPrice"
+                        class="form-label required-field"
+                        >Delivery Price</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-money-bill-transfer"></i
+                        ></span>
+                        <input
+                          type="number"
+                          step="50"
+                          id="deliveryPrice"
+                          name="deliveryPrice"
+                          class="form-control"
+                          required
+                        />
+                        <span class="input-group-text">DZD</span>
+                      </div>
+                    </div>
+
+                    <!-- Recipient Information -->
+                    <div class="form-section-title">
+                      <i class="fas fa-user-tie me-2"></i>Recipient Information
+                    </div>
+                    <div class="col-md-6">
+                      <label
+                        for="recipientName"
+                        class="form-label required-field"
+                        >Full Name</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-user"></i
+                        ></span>
+                        <input
+                          type="text"
+                          id="recipientName"
+                          name="recipientName"
+                          class="form-control"
+                          required
+                        />
+                      </div>
+                      <div class="invalid-feedback">
+                        Please enter recipient name.
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label
+                        for="recipientPhone"
+                        class="form-label required-field"
+                        >Phone Number</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-phone"></i
+                        ></span>
+                        <input
+                          type="tel"
+                          id="recipientPhone"
+                          name="recipientPhone"
+                          class="form-control"
+                          pattern="[0-9]{10}"
+                          required
+                        />
+                      </div>
+                      <div class="invalid-feedback">
+                        Please enter a valid 10-digit phone number.
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <label
+                        for="recipientAddress"
+                        class="form-label required-field"
+                        >Full Address</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text"
+                          ><i class="fas fa-map-marked-alt"></i
+                        ></span>
+                        <textarea
+                          id="recipientAddress"
+                          name="recipientAddress"
+                          rows="2"
+                          class="form-control"
+                          required
+                        ></textarea>
+                      </div>
+                      <div class="invalid-feedback">
+                        Please enter recipient address.
+                      </div>
+                    </div>
+
+                    <!-- Additional Notes -->
+                    <div class="col-12">
+                      <label for="notes" class="form-label">
+                        <i class="fas fa-sticky-note me-2"></i>Additional Notes
+                      </label>
+                      <textarea
+                        id="notes"
+                        name="notes"
+                        rows="2"
+                        class="form-control"
+                        placeholder="Special instructions, delivery preferences, etc."
+                      ></textarea>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="col-12 d-flex justify-content-end mt-4">
+                      <button
+                        type="button"
+                        class="btn btn-primary px-4"
+                        id="next-btn"
+                      >
+                        Next Step <i class="fas fa-arrow-right ms-2"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 2: Print -->
+                <div class="form-step" id="step2">
+                  <div class="row g-3">
+                    <!-- Order Summary -->
+                    <div class="col-md-12">
+                      <div class="form-section-title">
+                        <i class="fas fa-receipt me-2"></i>Order Summary
+                      </div>
+                      <div class="card p-3 mb-4">
+                        <div class="order-summary-item">
+                          <span>Product:</span>
+                          <span id="summary-productName"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>Quantity:</span>
+                          <span id="summary-quantity"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>Product Type:</span>
+                          <span id="summary-productType"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>Weight:</span>
+                          <span id="summary-weight"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>Volume:</span>
+                          <span id="summary-volume"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>From:</span>
+                          <span id="summary-start"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>To:</span>
+                          <span id="summary-end"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>Delivery Type:</span>
+                          <span id="summary-deliveryType"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>Recipient:</span>
+                          <span id="summary-recipient"></span>
+                        </div>
+                        <hr />
+                        <div class="order-summary-item">
+                          <span>Product Price:</span>
+                          <span id="summary-price"></span>
+                        </div>
+                        <div class="order-summary-item">
+                          <span>Delivery Cost:</span>
+                          <span id="summary-deliveryPrice"></span>
+                        </div>
+                        <div class="order-summary-item order-summary-total">
+                          <span>Total:</span>
+                          <span id="summary-total"></span>
+                        </div>
+                      </div>
+
+                      <!-- Terms and Conditions -->
+                      <div class="form-check mt-4">
+                        <input
+                          class="form-check-input"
+                          type="checkbox"
+                          id="termsCheck"
+                          required
+                        />
+                        <label class="form-check-label" for="termsCheck">
+                          I confirm that all information is correct
+                        </label>
+                        <div class="invalid-feedback">
+                          You must confirm before submitting.
+                        </div>
+                      </div>
+
+                      <!-- Navigation Buttons -->
+                      <div class="d-flex justify-content-between mt-4">
+                        <button
+                          type="button"
+                          class="btn btn-outline-secondary px-4"
+                          id="prev-btn"
+                        >
+                          <i class="fas fa-arrow-left me-2"></i> Previous
+                        </button>
+                        <button
+                          type="submit"
+                          class="btn btn-success px-4"
+                          id="submit-btn"
+                        >
+                          <i class="fas fa-check me-2"></i> Confirm Order
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ <script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Define wilaya zones (grouped by geographic proximity)
+
+    const wilayaNumbers = {
+  "Adrar": 1,
+  "Chlef": 2,
+  "Laghouat": 3,
+  "Oum El Bouaghi": 4,
+  "Batna": 5,
+  "Béjaïa": 6,
+  "Biskra": 7,
+  "Béchar": 8,
+  "Blida": 9,
+  "Bouira": 10,
+  "Tamanrasset": 11,
+  "Tébessa": 12,
+  "Tlemcen": 13,
+  "Tiaret": 14,
+  "Tizi Ouzou": 15,
+  "Alger": 16,
+  "Djelfa": 17,
+  "Jijel": 18,
+  "Sétif": 19,
+  "Saïda": 20,
+  "Skikda": 21,
+  "Sidi Bel Abbès": 22,
+  "Annaba": 23,
+  "Guelma": 24,
+  "Constantine": 25,
+  "Médéa": 26,
+  "Mostaganem": 27,
+  "M'Sila": 28,
+  "Mascara": 29,
+  "Ouargla": 30,
+  "Oran": 31,
+  "El Bayadh": 32,
+  "Illizi": 33,
+  "Bordj Bou Arréridj": 34,
+  "Boumerdès": 35,
+  "El Tarf": 36,
+  "Tindouf": 37,
+  "Tissemsilt": 38,
+  "El Oued": 39,
+  "Khenchela": 40,
+  "Souk Ahras": 41,
+  "Tipaza": 42,
+  "Mila": 43,
+  "Aïn Defla": 44,
+  "Naâma": 45,
+  "Aïn Témouchent": 46,
+  "Ghardaïa": 47,
+  "Relizane": 48,
+  "El M'Ghair": 49,
+  "El Menia": 50,
+  "Ouled Djellal": 51,
+  "Bordj Badji Mokhtar": 52,
+  "Béni Abbès": 53,
+  "Timimoun": 54,
+  "Touggourt": 55,
+  "Djanet": 56,
+  "In Salah": 57,
+  "In Guezzam": 58
+};
+
+    
+    const wilayaZones = {
+      "North-East": [6, 18, 19, 21, 23, 24, 25, 36, 41, 43],
+      "North-Central": [9, 10, 15, 16, 26, 35, 42],
+      "North-West": [2, 13, 14, 22, 27, 29, 31, 44, 46, 48],
+      Highlands: [3, 4, 5, 7, 17, 28, 34, 40],
+      "South-West": [1, 8, 20, 30, 32, 37, 45, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58],
+      "South-East": [11, 12, 33, 39]
+    };
+
+    // Base prices between zones (in DZD)
+    const zonePrices = {
+      SameZone: 400,
+      AdjacentZones: 600,
+      DistantZones: 900,
+      RemoteZones: 1500
+    };
+
+    // Zone adjacency mapping
+    const adjacentZones = {
+      "North-East": ["North-Central", "Highlands"],
+      "North-Central": ["North-East", "North-West", "Highlands"],
+      "North-West": ["North-Central", "Highlands"],
+      Highlands: ["North-East", "North-Central", "North-West", "South-West", "South-East"],
+      "South-West": ["Highlands", "South-East"],
+      "South-East": ["Highlands", "South-West"]
+    };
+
+    // Find which zone a wilaya belongs to
+    function getWilayaZone(wilayaNumber) {
+      for (const zone in wilayaZones) {
+        if (wilayaZones[zone].includes(wilayaNumber)) {
+          return zone;
+        }
+      }
+      return "North-Central";
+    }
+
+    // Calculate base price between two wilayas
+    function calculateBasePrice(startWilayaNum, endWilayaNum) {
+      // Same wilaya - special case (local delivery)
+      if (startWilayaNum === endWilayaNum) return 50;
+
+      const startZone = getWilayaZone(startWilayaNum);
+      const endZone = getWilayaZone(endWilayaNum);
+
+      // Same zone
+      if (startZone === endZone) return zonePrices["SameZone"];
+
+      // Adjacent zones
+      if (
+        adjacentZones[startZone]?.includes(endZone) ||
+        adjacentZones[endZone]?.includes(startZone)
+      ) {
+        return zonePrices["AdjacentZones"];
+      }
+
+      // South zones are more expensive
+      if (
+        (startZone.includes("South") && !endZone.includes("South")) ||
+        (!startZone.includes("South") && endZone.includes("South"))
+      ) {
+        return zonePrices["RemoteZones"];
+      }
+
+      // Default for other cases
+      return zonePrices["DistantZones"];
+    }
+
+    // Delivery price calculation function
+    function calculateDeliveryPrice() {
+  const startSelect = document.getElementById("startDestination");
+  const endSelect = document.getElementById("endDestination");
+  const homeDeliveryCheckbox = document.getElementById("homeDeliveryCheckbox");
+  const freeDeliveryCheckbox = document.getElementById("freeDeliveryCheckbox");
+  const deliveryPriceInput = document.getElementById("deliveryPrice");
+
+  if (startSelect.value && endSelect.value) {
+    const startState = startSelect.value;
+    const endState = endSelect.value;
+
+    // نحصل على أرقام الولايات انطلاقًا من أسمائها
+    const startNum = wilayaNumbers[startState];
+    const endNum = wilayaNumbers[endState];
+
+    let basePrice = calculateBasePrice(startNum, endNum);
+
+    if (homeDeliveryCheckbox.checked) {
+      basePrice += 250;
+    }
+
+    deliveryPriceInput.value = basePrice;
+    deliveryPriceInput.readOnly = true;
+  }
+}
+
+
+    // Toggle delivery price input based on free delivery checkbox
+    document.getElementById("freeDeliveryCheckbox").addEventListener("change", function() {
+      const deliveryPriceInput = document.getElementById("deliveryPrice");
+
+      if (this.checked) {
+        deliveryPriceInput.disabled = true;
+      } else {
+        deliveryPriceInput.disabled = false;
+      }
+    });
+
+    // Set event listeners for delivery calculation
+    document.getElementById("startDestination").addEventListener("change", calculateDeliveryPrice);
+    document.getElementById("endDestination").addEventListener("change", calculateDeliveryPrice);
+    document.getElementById("homeDeliveryCheckbox").addEventListener("change", calculateDeliveryPrice);
+    document.getElementById("freeDeliveryCheckbox").addEventListener("change", function() {
+      calculateDeliveryPrice();
+    });
+
+    // Multi-step form functionality
+    const form = document.getElementById("orderForm");
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const nextBtn = document.getElementById("next-btn");
+    const prevBtn = document.getElementById("prev-btn");
+    const step1Indicator = document.getElementById("step1-indicator");
+    const step2Indicator = document.getElementById("step2-indicator");
+    const stepBadge = document.getElementById("step-badge");
+
+    freeDeliveryCheckbox.addEventListener("change", function() {
+      if (freeDeliveryCheckbox.checked) {
+        homeDeliveryCheckbox.checked = false;
+        homeDeliveryCheckbox.disabled = false;
+      } else {
+        homeDeliveryCheckbox.disabled = false;
+      }
+    });
+
+    // Next button click handler
+    nextBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+
+      // Validate step 1 before proceeding
+      const requiredFields = step1.querySelectorAll("[required]");
+      let isValid = true;
+
+      requiredFields.forEach((field) => {
+        if (!field.value) {
+          field.classList.add("is-invalid");
+          isValid = false;
+        } else {
+          field.classList.remove("is-invalid");
+        }
+      });
+
+      // Special validation for phone number
+      const phoneInput = document.getElementById("recipientPhone");
+      if (phoneInput.value && !/^[0-9]{10}$/.test(phoneInput.value)) {
+        phoneInput.classList.add("is-invalid");
+        isValid = false;
+      }
+
+      if (isValid) {
+        // Update summary information
+        document.getElementById("summary-productName").textContent =
+          document.getElementById("productName").value;
+        document.getElementById("summary-quantity").textContent =
+          document.getElementById("quantity").value;
+        document.getElementById("summary-weight").textContent =
+          document.getElementById("weight").value + " kg";
+        document.getElementById("summary-volume").textContent =
+          document.getElementById("volume").value
+            ? document.getElementById("volume").value + " cm³"
+            : "N/A";
+        document.getElementById("summary-start").textContent =
+          document.getElementById("startDestination").value;
+        document.getElementById("summary-end").textContent =
+          document.getElementById("endDestination").value;
+        document.getElementById("summary-deliveryType").textContent =
+          document.getElementById("homeDeliveryCheckbox").checked
+            ? "Home Delivery"
+            : "Office Delivery";
+        document.getElementById("summary-recipient").textContent = `${
+          document.getElementById("recipientName").value
+        } (${document.getElementById("recipientPhone").value})`;
+
+        const price = parseFloat(document.getElementById("price").value) || 0;
+        const deliveryPrice = parseFloat(document.getElementById("deliveryPrice").value) || 0;
+        const total = price + deliveryPrice;
+
+        document.getElementById("summary-price").textContent = price.toFixed(2) + " DZD";
+        document.getElementById("summary-deliveryPrice").textContent = deliveryPrice.toFixed(2) + " DZD";
+        document.getElementById("summary-total").textContent = total.toFixed(2) + " DZD";
+
+        // Switch to step 2
+        step1.classList.remove("active");
+        step2.classList.add("active");
+        step1Indicator.classList.remove("active");
+        step1Indicator.classList.add("completed");
+        step2Indicator.classList.add("active");
+        stepBadge.textContent = "Step 2 of 2";
+      } else {
+        form.classList.add("was-validated");
+      }
+    });
+
+    // Previous button click handler
+    prevBtn.addEventListener("click", function(e) {
+      e.preventDefault();
+      step1.classList.add("active");
+      step2.classList.remove("active");
+      step1Indicator.classList.add("active");
+      step1Indicator.classList.remove("completed");
+      step2Indicator.classList.remove("active");
+      stepBadge.textContent = "Step 1 of 2";
+    });
+
+    // Form submission handler
+    form.addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      if (!document.getElementById("termsCheck").checked) {
+        document.getElementById("termsCheck").classList.add("is-invalid");
+        return;
+      }
+
+      const orderData = {
+        productName: document.getElementById("productName").value,
+        productType: document.getElementById("productType").value,
+        quantity: document.getElementById("quantity").value,
+        weight: document.getElementById("weight").value,
+        volume: document.getElementById("volume").value || null,
+        price: document.getElementById("price").value,
+        startDestination: document.getElementById("startDestination").value,
+        endDestination: document.getElementById("endDestination").value,
+        homeDelivery: document.getElementById("homeDeliveryCheckbox").checked,
+        freeDelivery: document.getElementById("freeDeliveryCheckbox").checked,
+        deliveryPrice: document.getElementById("deliveryPrice").value,
+        recipientName: document.getElementById("recipientName").value,
+        recipientPhone: document.getElementById("recipientPhone").value,
+        recipientAddress: document.getElementById("recipientAddress").value,
+        notes: document.getElementById("notes").value || null
+      };
+      const response = await axios.post("/api/orders", orderData);
+      const order = response.data;
+      const orderId = order.id;
+
+      displayOrderSummary(order, orderData);
+      generateQRCode(orderId);
+      await captureAndDownloadOrder(orderId);
+    });
+
+    function displayOrderSummary(order, orderData) {
+      document.getElementById("summary-productType").textContent = orderData.productType;
+      document.getElementById("print-productType").textContent = orderData.productType;
+      document.getElementById("print-orderId").textContent = order.id;
+      document.getElementById("print-productName").textContent = orderData.productName;
+      document.getElementById("print-quantity").textContent = orderData.quantity;
+      document.getElementById("print-weight").textContent = orderData.weight + " kg";
+      document.getElementById("print-volume").textContent = orderData.volume
+        ? orderData.volume + " cm³"
+        : "N/A";
+      document.getElementById("print-start").textContent = orderData.startDestination;
+      document.getElementById("print-end").textContent = orderData.endDestination;
+      document.getElementById("print-deliveryType").textContent = orderData.homeDelivery
+        ? "Home Delivery"
+        : "Office Delivery";
+      document.getElementById("print-recipientName").textContent = orderData.recipientName;
+      document.getElementById("print-recipientPhone").textContent = orderData.recipientPhone;
+      document.getElementById("print-recipientAddress").textContent = orderData.recipientAddress;
+      document.getElementById("print-senderName").textContent = order.senderName;
+      document.getElementById("print-senderPhone").textContent = order.senderPhone;
+      document.getElementById("print-price").textContent = parseFloat(orderData.price).toFixed(2) + " DZD";
+      document.getElementById("print-deliveryPrice").textContent = parseFloat(orderData.deliveryPrice).toFixed(2) + " DZD";
+
+      const total = parseFloat(orderData.price) + parseFloat(orderData.deliveryPrice);
+      document.getElementById("print-total").textContent = total.toFixed(2) + " DZD";
+
+      const now = new Date();
+      document.getElementById("print-date").textContent = now.toLocaleDateString() + " " + now.toLocaleTimeString();
+    }
+
+    function generateQRCode(orderId) {
+      const qrcodeContainer = document.getElementById("qrcode-container");
+      qrcodeContainer.innerHTML = "";
+
+      new QRCode(qrcodeContainer, {
+        text: `${orderId}`,
+        width: 150,
+        height: 150,
+        colorDark: "#2c3e50",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H
+      });
+    }
+
+    async function captureAndDownloadOrder(orderId) {
+      const printSection = document.getElementById("print-section");
+      printSection.style.display = "block";
+
+      return new Promise((resolve) => {
+        html2canvas(printSection).then(async (canvas) => {
+          printSection.style.display = "none";
+
+          const img = document.getElementById("order-summary-image");
+          img.src = canvas.toDataURL("image/png");
+
+          const link = document.createElement("a");
+          link.download = `${orderId}.png`;
+          link.href = img.src;
+          link.click();
+
+          try {
+            const blob = await new Promise((resolve) =>
+              canvas.toBlob(resolve, "image/png")
+            );
+            const formData = new FormData();
+            formData.append("image", blob, `order-${orderId}.png`);
+
+            const response = await fetch(`/saveimage/${orderId}`, {
+              method: "POST",
+              body: formData
+            });
+
+            if (!response.ok) {
+              console.error("Failed to upload image to server");
+            }
+          } catch (error) {
+            console.error("Error uploading image:", error);
+          }
+
+          resolve();
+          window.location.href = "/dashboard";
+        });
+      });
+    }
+  });
+
+  function setupNavbarEvents() {
+    const notificationBtn = document.getElementById("notificationBtn");
+    const notificationDropdown = document.getElementById("notificationDropdown");
+    const accountBtn = document.getElementById("accountBtn");
+    const accountDropdown = document.getElementById("accountDropdown");
+
+    if (!notificationBtn || !accountBtn) return;
+
+    notificationBtn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      notificationDropdown.classList.toggle("show");
+      accountDropdown.classList.remove("show");
+      await handleNotificationClick(); // mark as read
+    });
+
+    accountBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      accountDropdown.classList.toggle("show");
+      notificationDropdown.classList.remove("show");
+    });
+
+    document.addEventListener("click", () => {
+      notificationDropdown.classList.remove("show");
+      accountDropdown.classList.remove("show");
+    });
+
+    document.getElementById("newOrderBtn")?.addEventListener("click", () => {
+      alert("New Order button clicked!");
+    });
+  }
+
+  // Update Notification Badge
+  async function updateNotificationBadge() {
+    try {
+      const response = await fetch("/notifications/unread");
+      const data = await response.json();
+      const badge = document.querySelector(".notification-badge");
+
+      if (data.unreadCount > 0) {
+        badge.style.display = "inline-block";
+      } else {
+        badge.style.display = "none";
+      }
+    } catch (error) {
+      console.error("Error checking unread notifications:", error);
+    }
+  }
+
+  // Mark Notifications as Read
+  async function handleNotificationClick() {
+    try {
+      const response = await fetch("/notifications/mark-read", {
+        method: "POST"
+      });
+      if (response.ok) {
+        document.querySelector(".notification-badge").style.display = "none";
+      }
+    } catch (error) {
+      console.error("Error marking notifications as read:", error);
+    }
+  }
+
+  // Initialize when DOM is loaded
+  document.addEventListener("DOMContentLoaded", () => {
+    // Navbar buttons setup
+    setupNavbarEvents();
+
+    // Lucide icons
+    if (typeof lucide !== "undefined") {
+      lucide.createIcons();
+    }
+
+    // Start checking for notifications
+    updateNotificationBadge();
+    setInterval(updateNotificationBadge, 5000);
+  });
+</script>
+    <!-- Print Section -->
+    <div id="print-section" class="print-section">
+      <div class="print-header text-center mb-4">
+        <h2>Shipping Order Summary</h2>
+        <p class="text-muted">Order ID: <span id="print-orderId"></span></p>
+        <p class="text-muted">Order Date: <span id="print-date"></span></p>
+      </div>
+
+      <div class="row">
+        <div class="col-md-8">
+          <div class="print-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h4>Product Information</h4>
+                <p>
+                  <strong>Product Name:</strong>
+                  <span id="print-productName"></span>
+                </p>
+                <p>
+                  <strong>Product Type:</strong>
+                  <span id="print-productType"></span>
+                </p>
+                <p>
+                  <strong>Quantity:</strong> <span id="print-quantity"></span>
+                </p>
+                <p><strong>Weight:</strong> <span id="print-weight"></span></p>
+                <p><strong>Volume:</strong> <span id="print-volume"></span></p>
+                <p><strong>Price:</strong> <span id="print-price"></span></p>
+              </div>
+
+              <div class="col-md-6">
+                <h4>Delivery Information</h4>
+                <p><strong>From:</strong> <span id="print-start"></span></p>
+                <p><strong>To:</strong> <span id="print-end"></span></p>
+                <p>
+                  <strong>Delivery Type:</strong>
+                  <span id="print-deliveryType"></span>
+                </p>
+                <p>
+                  <strong>Delivery Cost:</strong>
+                  <span id="print-deliveryPrice"></span>
+                </p>
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-12">
+                <h4>Sender information</h4>
+                <p>
+                  <strong>Name:</strong> <span id="print-senderName"></span>
+                </p>
+                <p>
+                  <strong>Phone:</strong> <span id="print-senderPhone"></span>
+                </p>
+              </div>
+            </div>
+
+            <div class="row mt-3">
+              <div class="col-12">
+                <h4>Recipient Information</h4>
+                <p>
+                  <strong>Name:</strong> <span id="print-recipientName"></span>
+                </p>
+                <p>
+                  <strong>Phone:</strong>
+                  <span id="print-recipientPhone"></span>
+                </p>
+                <p>
+                  <strong>Address:</strong>
+                  <span id="print-recipientAddress"></span>
+                </p>
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div class="col-12">
+                <h4>Total</h4>
+                <p class="total-amount">
+                  <strong>Total Amount:</strong> <span id="print-total"></span>
+                </p>
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="signature-area">
+                  <p>Customer Signature: _________________________</p>
+                  <p>Date: _________________________</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div id="qrcode-container" class="mt-4"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hidden elements -->
+    <img id="order-summary-image" style="display: none" />
+  </body>
+</html>
