@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Advent+Pro:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Load It</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #fff;
+            font-family: "Advent Pro", sans-serif;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
+            width: 100%;
+            min-height: 100px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            background: #7eaede;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        img {
+            width: 200px;
+            height: auto;
+            transition: all 0.3s ease;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+        }
+
+        .Sign,
+        .nav-links a {
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 22px;
+            color: #fff !important;
+            padding: 10px 15px;
+            transition: 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #cae4ff;
+            bottom: 0;
+            left: 0;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .Sign:hover,
+        .nav-links a:hover {
+            color: #cae4ff !important;
+        }
+
+        .buttons {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .get-st {
+            font-family: "Advent Pro", serif;
+            font-weight: 600;
+            font-size: 22px;
+            padding: 12px 25px;
+            border-radius: 50px;
+            background-color: #cae4ff;
+            color: #248db7;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .get-st:hover {
+            background-color: #fff;
+            color: #123f6b;
+            transform: translateY(-2px);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .content-section {
+            padding: 100px 5%;
+            position: relative;
+            z-index: 2;
+            background: white;
+        }
+
+        .section-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #3475b6;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .about-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 40px;
+            align-items: center;
+        }
+
+        .about-text {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .about-text p {
+            font-size: 20px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .about-image {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .about-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .service-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 40px 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .service-icon {
+            font-size: 60px;
+            color: #1b7ca2;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .service-card:hover .service-icon {
+            transform: scale(1.1);
+            color: #123f6b;
+        }
+
+        .service-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: #123f6b;
+            margin-bottom: 20px;
+        }
+
+        .service-desc {
+            font-size: 18px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .contact-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .contact-info {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 900px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .contact-method:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .contact-icon {
+            font-size: 40px;
+            color: #1b7ca2;
+            margin-right: 20px;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .contact-details h3 {
+            font-size: 22px;
+            color: #123f6b;
+            margin-bottom: 10px;
+        }
+
+        .contact-details p,
+        .contact-details a {
+            font-size: 18px;
+            color: #555;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .contact-details a:hover {
+            color: #1b7ca2;
+            text-decoration: underline;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .video-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            color: white;
+            text-align: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 0 20px;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            animation: fadeInUp 2s ease forwards;
+        }
+
+        .hero-content p {
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            animation: fadeInUp 2s ease 0.5s forwards;
+            opacity: 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 35px;
+            font-size: 1.2em;
+            color: white;
+            background: #248db7;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            animation: fadeInUp 2s ease 1s forwards;
+            opacity: 0;
+        }
+
+        .btn:hover {
+            background-color: #ffffff;
+            color: #333;
+        }
+
+        @keyframes fadeInUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+        @media screen and (max-width: 992px) {
+            header {
+                padding: 0 3%;
+                min-height: 80px;
+            }
+
+            img {
+                width: 150px;
+            }
+
+            .nav-links {
+                gap: 15px;
+            }
+
+            .Sign,
+            .nav-links a,
+            .get-st {
+                font-size: 18px;
+            }
+
+            .get-st {
+                padding: 10px 20px;
+            }
+
+            .services-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 15px;
+                min-height: auto;
+            }
+
+            nav {
+                width: 100%;
+                justify-content: space-between;
+                margin-top: 15px;
+            }
+
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 15px;
+            }
+
+            .buttons {
+                width: 100%;
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+            .menu-toggle {
+                display: flex;
+                flex-direction: column;
+                cursor: pointer;
+            }
+
+            .menu-toggle div {
+                width: 25px;
+                height: 3px;
+                background-color: white;
+                margin: 3px 0;
+                transition: all 0.3s ease;
+            }
+
+            .show {
+                display: flex;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .content-section {
+                padding: 80px 5%;
+            }
+
+            .service-card {
+                padding: 30px 20px;
+            }
+
+            .service-icon {
+                font-size: 50px;
+            }
+        }
+
+        @media screen and (max-width: 576px) {
+            .section-title {
+                font-size: 30px;
+            }
+
+            .about-text p {
+                font-size: 18px;
+            }
+
+            .service-title {
+                font-size: 24px;
+            }
+
+            .service-desc {
+                font-size: 16px;
+            }
+
+            .contact-info {
+                padding: 25px;
+            }
+
+            .contact-method {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .contact-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <a href="index.html">
+            <img src="logo-2_1.svg" alt="Logo">
+        </a>
+
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+
+        <nav id="nav-menu">
+            <div class="nav-links">
+                <a href="#">Home</a>
+                <a href="#about">About Us</a>
+                <a href="#services">Services</a>
+                <a href="#contact">Contact</a>
+            </div>
+
+            <div class="buttons">
+                <a href="#" class="Sign" data-bs-toggle="modal" data-bs-target="#loginModal">Sign in</a>
+                <button onclick="window.location.href='/register';" class="get-st">Get Started</button>
+            </div>
+        </nav>
+    </header>
+
+    <div class="video-container">
+        <video autoplay muted loop>
+            <source src="promo.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <div class="video-overlay"></div>
+
+        <div class="hero-content">
+            <h1 class="animated-text">Partners of Success</h1>
+            <p>Your trusted partner for safe and fast transport across Algeria</p>
+            <a href="#services" class="btn">Explore Our Services</a>
+        </div>
+    </div>
+
+
+    <section id="about" class="content-section">
+        <h2 class="section-title">About Us</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Load It is a company specializing in interstate land transportation services. It was established to
+                    meet the growing need for safe, fast, and reliable transportation of goods and parcels within
+                    Algeria.
+                    We believe that trust and precision are the foundations of any successful transportation operation.
+                    That's why we strive to provide our services with the highest standards of quality and
+                    professionalism, utilizing a modern fleet of trucks and vehicles and a qualified and experienced
+                    staff.</p>
+            </div>
+            <div class="about-image">
+                <img src="main.jpg" alt="Warehouse">
+            </div>
+        </div>
+    </section>
+
+    <section id="services" class="content-section">
+        <h2 class="section-title">Our Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <h3 class="service-title">Road Freight</h3>
+                <p class="service-desc">
+                    Reliable and secure road transportation across all Algerian states with real-time tracking,
+                    optimized routes, and cargo safety guarantees.
+                </p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <h3 class="service-title">Parcel Delivery</h3>
+                <p class="service-desc">
+                    Fast and affordable parcel delivery services between cities, with office-to-door options, insured
+                    shipments, and efficient handling.
+                </p>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="service-title">Secure Cargo Handling</h3>
+                <p class="service-desc">
+                    Specialized handling for fragile, valuable, and sensitive goods ensuring protection and compliance
+                    with safety standards during transport.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="contact" class="content-section">
+        <h2 class="section-title">Contact Us</h2>
+        <div class="contact-container">
+            <div class="contact-info">
+                <div class="contact-methods">
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Email Us</h3>
+                            <a href="mailto:info@loadit.com">info@loadit.com</a>
+                            <a href="mailto:support@loadit.com">support@loadit.com</a>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Call Us</h3>
+                            <a href="tel:+2132929116">029291116</a>
+                            <a href="tel:+213549448527">0549448527</a>
+                        </div>
+                    </div>
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h3>Headquarters</h3>
+                            <p>123 Logistics Load It</p>
+                            <p>Algerian, Algeria</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title w-100 text-center" id="loginModalLabel">Sign in</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form action="/login" method="post">
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="email" name="email" placeholder="Email"
+                                required>
+                            <label for="email">Email</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="Password" required>
+                            <label for="password">Password</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Sign in</button>
+                    </form>
+                    <div class="text-center mt-3">
+                        <a href="/forgotpassword" class="text-decoration-none" data-bs-toggle="modal"
+                            data-bs-target="#passwordModal">Forget password?</a><br>
+                        <a href="/register" class="text-decoration-none">Don't have an account?</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function toggleMenu() {
+            const navMenu = document.getElementById("nav-menu");
+            const navLinks = navMenu.querySelector('.nav-links');
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            navLinks.classList.toggle('show');
+            menuToggle.classList.toggle('active');
+
+            navLinks.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    navLinks.classList.remove('show');
+                    menuToggle.classList.remove('active');
+                });
+            });
+        }
+
+        document.addEventListener('click', (event) => {
+            const navMenu = document.getElementById("nav-menu");
+            const menuToggle = document.querySelector('.menu-toggle');
+
+            if (!navMenu.contains(event.target) && !menuToggle.contains(event.target)) {
+                const navLinks = navMenu.querySelector('.nav-links');
+                navLinks.classList.remove('show');
+                menuToggle.classList.remove('active');
+            }
+        });
+
+        document.querySelector('header').style.background = '#248db7';
+    </script>
+
+</body>
+
+</html>
