@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Branch Managers Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --success-color: #4ad66d;
+            --warning-color: #f8961e;
+            --danger-color: #ef233c;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --border-color: #e0e0e0;
+            --text-muted: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            color: var(--dark-color);
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            padding: 2rem;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .back-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .search-filter-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+        }
+
+        .manager-card {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.8rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .manager-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.2rem;
+            padding-bottom: 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .manager-id {
+            font-weight: 600;
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            letter-spacing: 0.5px;
+        }
+
+        .manager-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .detail-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-section h3 i {
+            font-size: 1rem;
+        }
+
+        .detail-group {
+            margin-bottom: 0.8rem;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.3rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+
+        .action-btn i {
+            font-size: 0.9rem;
+        }
+
+        .btn-edit {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+        }
+
+        .btn-edit:hover {
+            background-color: #d0e3fa;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background-color: #d61f2f;
+            transform: translateY(-2px);
+        }
+
+        .btn-add {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-add:hover {
+            background-color: #3ac05d;
+            transform: translateY(-2px);
+        }
+
+        .no-managers, .no-results {
+            text-align: center;
+            padding: 3rem;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-top: 1rem;
+        }
+
+        .no-managers i, .no-results i {
+            font-size: 3.5rem;
+            color: #ddd;
+            margin-bottom: 1.5rem;
+        }
+
+        .no-managers p, .no-results p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(3px);
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 500px;
+            max-width: 95%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-title {
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+        }
+
+        .modal-title i {
+            color: var(--warning-color);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.7rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            animation: shake 0.3s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1100;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .alert-success {
+            background-color: var(--success-color);
+        }
+
+        .alert-error {
+            background-color: var(--danger-color);
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        /* Select dropdown styles */
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: "▼";
+            font-size: 0.8rem;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%);
+            position: absolute;
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        select.form-control {
+            appearance: none;
+            padding-right: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="/director/" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+
+        <h1 class="page-title"><i class="fas fa-map-marked-alt"></i> Branch Managers Management</h1>
+        
+        <div class="search-filter-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by manager name..." oninput="filterManagers()">
+                <i class="fas fa-search"></i>
+            </div>
+            <button class="action-btn btn-add" onclick="showAddModal()">
+                <i class="fas fa-plus"></i> Add New Manager
+            </button>
+        </div>
+
+        <% if (managers.length > 0) { %>
+            <div id="managersContainer">
+                <% managers.forEach(manager => { %>
+                    <div class="manager-card" data-id="<%= manager.id %>" data-name="<%= manager.full_name.toLowerCase() %>">
+                        <div class="manager-header">
+                            <span class="manager-id">MGR-<%= manager.id %></span>
+                        </div>
+
+                        <div class="manager-details">
+                            <!-- Personal Info -->
+                            <div class="detail-section">
+                                <h3><i class="fas fa-user"></i> Personal Information</h3>
+                                <div class="detail-group">
+                                    <div class="detail-label">Full Name</div>
+                                    <div class="detail-value"><%= manager.full_name %></div>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">Phone Number</div>
+                                    <div class="detail-value"><%= manager.phone %></div>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">BirthDate</div>
+                                    <div class="detail-value"><%= manager.birthdate || 'N/A' %></div>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">Address</div>
+                                    <div class="detail-value"><%= manager.address || 'N/A' %></div>
+                                </div>
+                            </div>
+
+                            <div class="detail-section">
+                                <h3><i class="fas fa-shield-halved"></i> Information Security</h3>
+                                <div class="detail-group">
+                                    <div class="detail-label">Email</div>
+                                    <div class="detail-value"><%= manager.email || 'N/A' %></div>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">Password</div>
+                                    <div class="detail-value"><%= manager.password %></div>
+                                </div>
+                            </div>
+
+                            <!-- Work Info -->
+                            <div class="detail-section">
+                                <h3><i class="fas fa-briefcase"></i> Work Information</h3>
+                                <div class="detail-group">
+                                    <div class="detail-label">Assigned State</div>
+                                    <div class="detail-value"><%= manager.state %></div>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">Join Date</div>
+                                    <%= manager.join_date ? manager.join_date.toDateString() : '' %>
+                                </div>
+                                <div class="detail-group">
+                                    <div class="detail-label">Salary</div>
+                                    <div class="detail-value"><%= manager.salary %></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <button class="action-btn btn-edit" onclick="showEditModal('<%= manager.id %>')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="action-btn btn-delete" onclick="showDeleteModal('<%= manager.id %>', '<%= manager.name %>')">
+                                <i class="fas fa-trash-alt"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+                <i class="fas fa-user-slash"></i>
+                <p>No matching managers found</p>
+            </div>
+        <% } else { %>
+            <div class="no-managers">
+                <i class="fas fa-users-slash"></i>
+                <p>No branch managers registered</p>
+            </div>
+        <% } %>
+
+        <!-- Add/Edit Manager Modal -->
+        <div class="modal" id="managerModal">
+            <div class="modal-content">
+                <h3 class="modal-title" id="modalTitle">
+                    <i class="fas fa-user-plus"></i> Add New Branch Manager
+                </h3>
+                <form id="managerForm">
+                    <input type="hidden" id="managerId" />
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">Full Name *</label>
+                            <input type="text" id="fullName" class="form-control" required />
+                            <div class="error-message" id="nameError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter full name
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="birthdate">Birth Date</label>
+                            <input type="date" id="birthdate" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" class="form-control" required />
+                            <div class="error-message" id="phoneError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter phone number
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email *</label>
+                            <input type="email" id="email" class="form-control" required />
+                            <div class="error-message" id="emailError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter valid email
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="password">Password *</label>
+                            <input type="text" id="password" class="form-control" required />
+                            <div class="error-message" id="passwordError">
+                                <i class="fas fa-exclamation-circle"></i> Please enter password
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="salary">Salary</label>
+                            <input type="number" id="salary" class="form-control" min="0" />
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="address">Address</label>
+                            <textarea id="address" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="joindate">Join Date *</label>
+                            <input type="date" id="joindate" class="form-control" required />
+                            <div class="error-message" id="joindateError">
+                                <i class="fas fa-exclamation-circle"></i> Please select Join Date
+                            </div>
+                        </div>
+                        <div class="form-group select-wrapper">
+                            <label for="state">Assigned State *</label>
+                            <select id="state" class="form-control" required>
+                                <option value="">Select State</option>
+                                <option value="Adrar">Adrar</option>
+                                <option value="Chlef">Chlef</option>
+                                <option value="Laghouat">Laghouat</option>
+                                <option value="Oum El Bouaghi">Oum El Bouaghi</option>
+                                <option value="Batna">Batna</option>
+                                <option value="Béjaïa">Béjaïa</option>
+                                <option value="Biskra">Biskra</option>
+                                <option value="Béchar">Béchar</option>
+                                <option value="Blida">Blida</option>
+                                <option value="Bouira">Bouira</option>
+                                <option value="Tamanrasset">Tamanrasset</option>
+                                <option value="Tébessa">Tébessa</option>
+                                <option value="Tlemcen">Tlemcen</option>
+                                <option value="Tiaret">Tiaret</option>
+                                <option value="Tizi Ouzou">Tizi Ouzou</option>
+                                <option value="Algiers">Algiers</option>
+                                <option value="Djelfa">Djelfa</option>
+                                <option value="Jijel">Jijel</option>
+                                <option value="Sétif">Sétif</option>
+                                <option value="Saïda">Saïda</option>
+                                <option value="Skikda">Skikda</option>
+                                <option value="Sidi Bel Abbès">Sidi Bel Abbès</option>
+                                <option value="Annaba">Annaba</option>
+                                <option value="Guelma">Guelma</option>
+                                <option value="Constantine">Constantine</option>
+                                <option value="Médéa">Médéa</option>
+                                <option value="Mostaganem">Mostaganem</option>
+                                <option value="M'Sila">M'Sila</option>
+                                <option value="Mascara">Mascara</option>
+                                <option value="Ouargla">Ouargla</option>
+                                <option value="Oran">Oran</option>
+                                <option value="El Bayadh">El Bayadh</option>
+                                <option value="Illizi">Illizi</option>
+                                <option value="Bordj Bou Arréridj">Bordj Bou Arréridj</option>
+                                <option value="Boumerdès">Boumerdès</option>
+                                <option value="El Tarf">El Tarf</option>
+                                <option value="Tindouf">Tindouf</option>
+                                <option value="Tissemsilt">Tissemsilt</option>
+                                <option value="El Oued">El Oued</option>
+                                <option value="Khenchela">Khenchela</option>
+                                <option value="Souk Ahras">Souk Ahras</option>
+                                <option value="Tipaza">Tipaza</option>
+                                <option value="Mila">Mila</option>
+                                <option value="Aïn Defla">Aïn Defla</option>
+                                <option value="Naâma">Naâma</option>
+                                <option value="Aïn Témouchent">Aïn Témouchent</option>
+                                <option value="Ghardaïa">Ghardaïa</option>
+                                <option value="Relizane">Relizane</option>
+                                <option value="Timimoun">Timimoun</option>
+                                <option value="Bordj Badji Mokhtar">Bordj Badji Mokhtar</option>
+                                <option value="Ouled Djellal">Ouled Djellal</option>
+                                <option value="Béni Abbès">Béni Abbès</option>
+                                <option value="In Salah">In Salah</option>
+                                <option value="In Guezzam">In Guezzam</option>
+                                <option value="Touggourt">Touggourt</option>
+                                <option value="Djanet">Djanet</option>
+                                <option value="El M'Ghair">El M'Ghair</option>
+                                <option value="El Menia">El Menia</option>
+                            </select>
+                            <div class="error-message" id="stateError">
+                                <i class="fas fa-exclamation-circle"></i> Please select state
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button type="button" onclick="closeModal('managerModal')" class="action-btn" style="background: #ccc;">Cancel</button>
+                        <button type="submit" class="action-btn btn-add">
+                            <i class="fas fa-save"></i> Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div class="modal" id="deleteModal">
+            <div class="modal-content">
+                <h3 class="modal-title"><i class="fas fa-trash-alt" style="color: var(--danger-color)"></i> Delete Branch Manager</h3>
+                <p id="deleteMessage">Are you sure you want to delete this manager? This action cannot be undone.</p>
+                <div class="modal-actions">
+                    <button onclick="closeModal('deleteModal')" class="action-btn" style="background: #ccc;">Cancel</button>
+                    <button onclick="deleteManager()" class="action-btn btn-delete">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                </div>
+                <input type="hidden" id="managerToDelete">
+            </div>
+        </div>
+
+        <!-- State Conflict Modal -->
+        <div class="modal" id="stateConflictModal">
+            <div class="modal-content">
+                <h3 class="modal-title"><i class="fas fa-exclamation-triangle" style="color: var(--warning-color)"></i> State Assignment Conflict</h3>
+                <p id="conflictMessage">The selected state is already assigned to another manager. Do you want to transfer responsibility to this new manager?</p>
+                <div class="modal-actions">
+                    <button onclick="resolveConflict(true)" class="action-btn btn-add">
+                        <i class="fas fa-check"></i> Yes, transfer
+                    </button>
+                    <button onclick="resolveConflict(false)" class="action-btn" style="background: #ccc;">No, choose another</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentManagerId = null;
+        let isEditMode = false;
+        let originalState = '';
+        let conflictManagerId = null;
+        let conflictManagerName = '';
+
+        // Filter managers function
+        function filterManagers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const managers = document.querySelectorAll('.manager-card');
+            let hasResults = false;
+            
+            managers.forEach(manager => {
+                const managerName = manager.getAttribute('data-name');
+                
+                if (managerName.includes(searchTerm)) {
+                    manager.style.display = 'block';
+                    hasResults = true;
+                } else {
+                    manager.style.display = 'none';
+                }
+            });
+            
+            document.getElementById('noResults').style.display = hasResults ? 'none' : 'block';
+        }
+
+        // Show add manager modal
+        function showAddModal() {
+            isEditMode = false;
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add New Branch Manager';
+            document.getElementById('managerForm').reset();
+            document.getElementById('managerId').value = '';
+            document.getElementById('joindate').valueAsDate = new Date();
+            openModal('managerModal');
+        }
+
+        // Show edit manager modal
+        async function showEditModal(managerId) {
+            isEditMode = true;
+            currentManagerId = managerId;
+            
+            try {
+                // Fetch manager data from server
+                const response = await fetch(`/branch-managers/${managerId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch manager data');
+                }
+                
+                const manager = await response.json();
+                
+                // Fill the form with manager data
+                document.getElementById('modalTitle').innerHTML = '<i class="fas fa-user-edit"></i> Edit Manager';
+                document.getElementById('managerId').value = manager.id;
+                document.getElementById('fullName').value = manager.full_name || '';
+                document.getElementById('birthdate').value = manager.birthdate ? manager.birthdate.split('T')[0] : '';
+                document.getElementById('phone').value = manager.phone || '';
+                document.getElementById('email').value = manager.email || '';
+                document.getElementById('password').value = manager.password || '';
+                document.getElementById('salary').value = manager.salary || '';
+                document.getElementById('address').value = manager.address || '';
+                document.getElementById('state').value = manager.state || '';
+                document.getElementById('joindate').value = manager.join_date ? manager.join_date.split('T')[0] : '';
+                
+                // Store original state for conflict checking
+                originalState = manager.state || '';
+                
+                openModal('managerModal');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Show delete confirmation modal
+        function showDeleteModal(managerId, managerName) {
+            currentManagerId = managerId;
+            document.getElementById('managerToDelete').value = managerId;
+            document.getElementById('deleteMessage').textContent = 
+                `Are you sure you want to delete manager "${managerName}"? This action cannot be undone.`;
+            openModal('deleteModal');
+        }
+
+        // Handle form submission
+        document.getElementById('managerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!validateForm()) return;
+            
+            const selectedState = document.getElementById('state').value;
+            
+            // Only check for conflict if it's a new manager or the state has changed
+            if (!isEditMode || selectedState !== originalState) {
+                try {
+                    const conflict = await checkStateConflict(selectedState);
+                    if (conflict && conflict.conflict) {
+                        conflictManagerId = conflict.managerId;
+                        conflictManagerName = conflict.managerName;
+                        document.getElementById('conflictMessage').textContent = 
+                            `The state "${selectedState}" is already assigned to manager ${conflict.managerName}. Do you want to transfer responsibility to this new manager?`;
+                        openModal('stateConflictModal');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error checking state conflict:', error);
+                    return;
+                }
+            }
+            
+            await saveManager();
+        });
+
+        // Check if state is already assigned to another manager
+        async function checkStateConflict(state) {
+            try {
+                const url = `/branch-managers/check-state?state=${encodeURIComponent(state)}${isEditMode ? `&excludeId=${currentManagerId}` : ''}`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Failed to check state conflict');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error:', error);
+                throw error;
+            }
+        }
+
+        // Resolve state conflict
+        async function resolveConflict(transfer) {
+            closeModal('stateConflictModal');
+            
+            if (!transfer) {
+                // If user chooses not to transfer, reopen the manager modal
+                openModal('managerModal');
+                return;
+            }
+
+            try {
+                // 1. First save the new manager
+                const saveSuccess = await saveManager();
+                if (!saveSuccess) {
+                    throw new Error('Failed to save new manager');
+                }
+
+                // 2. Then delete the previous manager
+                const deleteResponse = await fetch(`/branch-managers/${conflictManagerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!deleteResponse.ok) {
+                    throw new Error('Failed to delete previous manager');
+                }
+                
+                // 3. Show success message and reload
+                setTimeout(() => window.location.reload(), 1500);
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Reopen the manager modal if there was an error
+                openModal('managerModal');
+            }
+        }
+
+        // Save manager data
+        async function saveManager() {
+            const formData = {
+                name: document.getElementById('fullName').value.trim(),
+                birthdate: document.getElementById('birthdate').value,
+                phone: document.getElementById('phone').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                password: document.getElementById('password').value,
+                salary: document.getElementById('salary').value,
+                address: document.getElementById('address').value.trim(),
+                joindate: document.getElementById('joindate').value,
+                state: document.getElementById('state').value
+            };
+
+            try {
+                const submitBtn = document.querySelector('#managerForm button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                
+                // Determine the API endpoint and method based on edit/add mode
+                const url = isEditMode ? `/branch-managers/${currentManagerId}` : '/branch-managers';
+                const method = isEditMode ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to save manager data');
+                }
+                
+                await response.json();
+                closeModal('managerModal');
+                location.reload();
+                return true;
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            } finally {
+                const submitBtn = document.querySelector('#managerForm button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-save"></i> Save';
+                }
+            }
+        }
+
+        // Delete manager
+        async function deleteManager() {
+            try {
+                const deleteBtn = document.querySelector('#deleteModal .btn-delete');
+                deleteBtn.disabled = true;
+                deleteBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                
+                const response = await fetch(`/branch-managers/${currentManagerId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to delete manager');
+                }
+                location.reload();
+                closeModal('deleteModal');
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                const deleteBtn = document.querySelector('#deleteModal .btn-delete');
+                if (deleteBtn) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i> Delete';
+                }
+            }
+        }
+
+        // Form validation
+        function validateForm() {
+            let isValid = true;
+            
+            // Reset error messages
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Validate required fields
+            const requiredFields = [
+                { id: 'fullName', errorId: 'nameError' },
+                { id: 'phone', errorId: 'phoneError' },
+                { id: 'email', errorId: 'emailError' },
+                { id: 'password', errorId: 'passwordError' },
+                { id: 'joindate', errorId: 'joindateError' },
+                { id: 'state', errorId: 'stateError' }
+            ];
+            
+            requiredFields.forEach(field => {
+                const value = document.getElementById(field.id).value.trim();
+                if (!value) {
+                    document.getElementById(field.errorId).style.display = 'flex';
+                    isValid = false;
+                }
+            });
+            
+            // Additional validation for email format
+            const email = document.getElementById('email').value.trim();
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('emailError').textContent = 'Please enter a valid email address';
+                document.getElementById('emailError').style.display = 'flex';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+        // Open modal
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>
