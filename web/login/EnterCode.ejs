@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Enter Verification Code</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .code-container {
+      max-width: 400px;
+      width: 100%;
+    }
+    .email-edit {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+    }
+    .email-edit a {
+      color: #0d6efd;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body class="d-flex align-items-center justify-content-center min-vh-100">
+
+  <div class="code-container bg-white p-4 rounded shadow">
+    <div class="text-center mb-4">
+      <img src="logo-large.svg" alt="Logo" width="100" class="mb-2" />
+      <h2 class="h5">Enter Verification Code</h2>
+      <p class="text-muted small mb-1">We've sent a 6-digit code to:</p>
+      <div class="email-edit">
+        <span id="userEmail"><%= email %></span>
+        <a href="forgot-password.html" title="Edit email">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+            <path d="M12.146.854a.5.5 0 0 1 .708 0l2.292 2.292a.5.5 0 0 1 0 .708L13.207 5.793l-3-3L12.146.854ZM11.5 6.5l-3-3L1 11v3h3L11.5 6.5Z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+  <div class="alert alert-danger" role="alert">
+    <%= errorMessage %>
+  </div>
+<% } %>
+
+
+    <form action="/verify-code" method="post">
+      <div class="form-floating mb-3">
+        <input type="text" class="form-control" id="code" name="code" placeholder="123456" required maxlength="6">
+        <label for="code">Enter the 6-digit code</label>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100">Verify Code</button>
+    </form>
+
+    <div class="text-center mt-3">
+      <small class="text-muted">Didn't get the code? <a href="/resendcode" class="text-decoration-none">Resend</a></small>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
