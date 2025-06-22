@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doorstep Delivery - Motorcycle Drivers</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --delivery-color: #7209b7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            color: var(--dark-color);
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #030303, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .back-btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .page-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .page-title h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-title p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .drivers-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .driver-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-top: 5px solid var(--delivery-color);
+        }
+
+        .driver-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .driver-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .driver-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--delivery-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+
+        .driver-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .driver-details {
+            margin-top: 1rem;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 0.8rem;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            min-width: 100px;
+            color: #666;
+        }
+
+        .detail-value {
+            flex: 1;
+        }
+
+        .search-filter {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .filter-select {
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background-color: white;
+            min-width: 200px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .driver-card {
+            animation: fadeIn 0.5s ease-in-out forwards;
+            opacity: 0;
+        }
+
+        .driver-card:nth-child(1) { animation-delay: 0.1s; }
+        .driver-card:nth-child(2) { animation-delay: 0.2s; }
+        .driver-card:nth-child(3) { animation-delay: 0.3s; }
+        .driver-card:nth-child(4) { animation-delay: 0.4s; }
+        .driver-card:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <a href="/workers" class="back-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1 class="page-title"><i class="fas fa-shipping-fast"></i> Doorstep Delivery</h1>
+
+        <div class="search-filter">
+            <div class="search-row">
+                <input type="text" class="search-input" placeholder="Search drivers by name, phone, or area...">
+            </div>
+        </div>
+
+        <% if (drivers.length > 0) { %>
+        <div class="drivers-container">
+            <% drivers.forEach(driver => { %>
+                <div class="driver-card" data-workLocation="<%= driver.workLocation %>">
+                    <div class="driver-header">
+                        <div class="driver-avatar">
+                            <%= driver.name.split(' ').map(n => n[0]).join('').toUpperCase() %>
+                        </div>
+                        <div>
+                            <div class="driver-name"><%= driver.name %></div>
+                        </div>
+                    </div>
+                    <div class="driver-details">
+                        <div class="detail-row">
+                            <span class="detail-label">Phone:</span>
+                            <span class="detail-value"><%= driver.tel%></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">workLocation:</span>
+                            <span class="detail-value"><%= driver.workLocation %></span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Vehicle:</span>
+                            <span class="detail-value"><%= driver.vehicle %></span>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+         <% } else { %>
+            <div class="no-drivers-message" style="
+                background: rgba(255, 255, 255, 0.95);
+                border-radius: 15px;
+                padding: 2rem;
+                text-align: center;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                margin-top: 2rem;
+            ">
+                <i class="fas fa-exclamation-circle" style="font-size: 3rem; color: #666; margin-bottom: 1rem;"></i>
+                <h2 style="color: #333;">No Drivers Available</h2>
+                <p style="color: #666;">There are currently no motorcycle drivers available for doorstep delivery.</p>
+            </div>
+        <% } %>
+    </div>
+
+    <script>
+        // Search functionality
+        document.querySelector('.search-input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const driverCards = document.querySelectorAll('.driver-card');
+            let visibleCards = 0;
+            
+            driverCards.forEach(card => {
+                const driverName = card.querySelector('.driver-name').textContent.toLowerCase();
+                const phone = card.querySelector('.detail-row:nth-child(1) .detail-value').textContent.toLowerCase();
+                const workLocation = card.querySelector('.detail-row:nth-child(2) .detail-value').textContent.toLowerCase();
+                
+                if (driverName.includes(searchTerm) || phone.includes(searchTerm) || workLocation.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    visibleCards++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const noResultsMessage = document.querySelector('.no-results-message');
+            if (visibleCards === 0 && driverCards.length > 0) {
+                if (!noResultsMessage) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'no-results-message';
+                    messageDiv.style = `
+                        background: rgba(255, 255, 255, 0.95);
+                        border-radius: 15px;
+                        padding: 2rem;
+                        text-align: center;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                        margin-top: 2rem;
+                    `;
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-search" style="font-size: 3rem; color: #666; margin-bottom: 1rem;"></i>
+                        <h2 style="color: #333;">No Drivers Found</h2>
+                        <p style="color: #666;">No drivers match your search criteria.</p>
+                    `;
+                    document.querySelector('.drivers-container').after(messageDiv);
+                }
+            } else if (noResultsMessage) {
+                noResultsMessage.remove();
+            }
+        });
+
+        document.getElementById('workLocation-filter').addEventListener('change', function(e) {
+            const selectedworkLocation = e.target.value;
+            const driverCards = document.querySelectorAll('.driver-card');
+            let visibleCards = 0;
+            
+            if (!selectedworkLocation) {
+                driverCards.forEach(card => {
+                    card.style.display = 'block';
+                    visibleCards++;
+                });
+            } else {
+                driverCards.forEach(card => {
+                    const workLocation = card.getAttribute('data-workLocation');
+                    
+                    if (workLocation === selectedworkLocation) {
+                        card.style.display = 'block';
+                        visibleCards++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            }
+
+            const noResultsMessage = document.querySelector('.no-results-message');
+            if (visibleCards === 0 && driverCards.length > 0) {
+                if (!noResultsMessage) {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = 'no-results-message';
+                    messageDiv.style = `
+                        background: rgba(255, 255, 255, 0.95);
+                        border-radius: 15px;
+                        padding: 2rem;
+                        text-align: center;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                        margin-top: 2rem;
+                    `;
+                    messageDiv.innerHTML = `
+                        <i class="fas fa-map-marker-alt" style="font-size: 3rem; color: #666; margin-bottom: 1rem;"></i>
+                        <h2 style="color: #333;">No Drivers in Selected Area</h2>
+                        <p style="color: #666;">There are no drivers available in ${selectedworkLocation}.</p>
+                    `;
+                    document.querySelector('.drivers-container').after(messageDiv);
+                }
+            } else if (noResultsMessage) {
+                noResultsMessage.remove();
+            }
+        });
+
+        // Filter by municipality
+        document.getElementById('workLocation-filter').addEventListener('change', function(e) {
+            const selectedworkLocation = e.target.value;
+            const driverCards = document.querySelectorAll('.driver-card');
+            
+            if (!selectedworkLocation) {
+                driverCards.forEach(card => card.style.display = 'block');
+                return;
+            }
+            
+            driverCards.forEach(card => {
+                const workLocation = card.getAttribute('data-workLocation');
+                
+                if (workLocation === selectedworkLocation) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

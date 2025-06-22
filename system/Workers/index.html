@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Management System</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;700&display=swap');
+
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3f37c9;
+            --accent-color: #4cc9f0;
+            --dark-color: #1a1a2e;
+            --light-color: #f8f9fa;
+            --success-color: #4ad66d;
+            --warning-color: #f8961e;
+            --danger-color: #ef233c;
+            --delivery-color: #7209b7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            color: var(--dark-color);
+            min-height: 100vh;
+            background: linear-gradient(-45deg, #030303, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 3rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+
+        .logout-btn {
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-desc {
+            color: #666;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .card:nth-child(1) .card-icon { color: var(--success-color); }
+        .card:nth-child(2) .card-icon { color: var(--primary-color); }
+        .card:nth-child(3) .card-icon { color: var(--warning-color); }
+        .card:nth-child(4) .card-icon { color: var(--danger-color); }
+        .card:nth-child(5) .card-icon { color: var(--delivery-color); }
+
+        .section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-row label {
+            font-weight: 500;
+            min-width: 120px;
+        }
+
+        .form-row input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .form-row input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .result-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card:nth-child(1) { animation: fadeIn 0.5s ease-in-out 0.1s forwards; opacity: 0; }
+        .card:nth-child(2) { animation: fadeIn 0.5s ease-in-out 0.2s forwards; opacity: 0; }
+        .card:nth-child(3) { animation: fadeIn 0.5s ease-in-out 0.3s forwards; opacity: 0; }
+        .card:nth-child(4) { animation: fadeIn 0.5s ease-in-out 0.4s forwards; opacity: 0; }
+        .card:nth-child(5) { animation: fadeIn 0.5s ease-in-out 0.5s forwards; opacity: 0; }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="app-header">
+            <div class="logo-container">
+                <img src="../logo-2_1.svg" alt="Company Logo" class="logo">
+            </div>
+            <a href="/logout" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+
+        </header>
+
+        <div class="cards-container">
+            <div class="card" onclick="navigateTo('/confirmed')">
+                <div class="card-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h3 class="card-title">Confirmed parcels</h3>
+                <p class="card-desc">Parcels ready for delivery</p>
+            </div>
+
+            <div class="card" onclick="navigateTo('/ready')">
+                <div class="card-icon">
+                    <i class="fas fa-box-open"></i>
+                </div>
+                <h3 class="card-title">Ready for collection</h3>
+                <p class="card-desc">Parcels ready for customer pickup</p>
+            </div>
+
+            <div class="card" onclick="navigateTo('/problematic')">
+                <div class="card-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="card-title">Problematic parcels</h3>
+                <p class="card-desc">Parcels with issues or delays</p>
+            </div>
+
+            <div class="card" onclick="navigateTo('/returned')">
+                <div class="card-icon">
+                    <i class="fas fa-undo"></i>
+                </div>
+                <h3 class="card-title">Return parcels</h3>
+                <p class="card-desc">Parcels returned by customers</p>
+            </div>
+
+            <div class="card" onclick="navigateTo('/motorcycle-delivery')">
+                <div class="card-icon">
+                    <i class="fas fa-motorcycle"></i>
+                </div>
+                <h3 class="card-title">Doorstep Delivery</h3>
+                <p class="card-desc">Motorcycle drivers for home delivery</p>
+            </div>
+        </div>
+
+        <!-- Order Confirmation Section -->
+        <div class="section">
+            <h2 class="section-title">Order Confirmation</h2>
+            <div class="form-group">
+                <div class="form-row">
+                    <label for="parcel-id">Parcel ID:</label>
+                    <input type="text" id="parcel-id" placeholder="Enter parcel ID">
+                    <button class="btn btn-primary" onclick="confirmParcel()">Confirm</button>
+                </div>
+            </div>
+            <div class="result-box" id="parcel-result">
+                <!-- Results will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Customer Balance Section -->
+        <div class="section">
+    <h2 class="section-title">Customer Balance</h2>
+    <div class="form-group">
+        <div class="form-row">
+            <label for="customer-firstname">Customer First Name:</label>
+            <input type="text" id="customer-firstname" placeholder="Enter customer first name">
+        </div>
+        <div class="form-row">
+            <label for="customer-lastname">Customer Last Name:</label>
+            <input type="text" id="customer-lastname" placeholder="Enter customer last name">
+        </div>
+        <button class="btn btn-primary" onclick="checkBalance()">Check Balance</button>
+
+        <div class="form-row" id="balance-update-row" style="display: none;">
+            <label for="balance-amount">Amount:</label>
+            <input type="number" id="balance-amount" placeholder="Enter amount">
+            <button class="btn btn-primary" onclick="updateBalance()">Update Balance</button>
+        </div>
+    </div>
+    <div class="result-box" id="balance-result">
+        <!-- Results will be displayed here -->
+    </div>
+</div>
+
+
+        <!-- Account Verification Section -->
+        <div class="section">
+    <h2 class="section-title">Account Verification</h2>
+    <div class="form-group">
+        <div class="form-row">
+            <label for="customer-firstname">First Name:</label>
+            <input type="text" id="customer-firstnamev" placeholder="Enter first name">
+            <label for="customer-lastname">Last Name:</label>
+            <input type="text" id="customer-lastnamev" placeholder="Enter last name">
+            <button class="btn btn-primary" onclick="checkVerification()">Check Verification</button>
+        </div>
+        <div class="form-row" id="verification-update-row" style="display: none;">
+            <label for="id-card-number">ID Card Number:</label>
+            <input type="text" id="id-card-number" placeholder="Enter ID card number">
+            <button class="btn btn-primary" onclick="verifyAccount()">Verify Account</button>
+        </div>
+    </div>
+    <div class="result-box" id="verification-result">
+        <!-- Results will be displayed here -->
+    </div>
+</div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation function
+        function navigateTo(page) {
+            window.location.href = page;
+        }
+
+        // Order confirmation function
+        async function confirmParcel() {
+            const parcelId = document.getElementById('parcel-id').value;
+            
+            if (!parcelId) {
+                showResult('parcel-result', 'Please enter a parcel ID', 'error');
+                return;
+            }
+                
+            try {
+                const response = await fetch("/order/confirme", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ parcelId: parcelId })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Failed to confirm parcel');
+                }
+
+                showResult('parcel-result', data.message || `Parcel #${parcelId} confirmed successfully`, 'success');
+                document.getElementById('parcel-id').value = '';
+
+            } catch (error) {
+                console.error('Error:', error);
+                showResult('parcel-result', error.message || 'An error occurred while confirming parcel', 'error');
+            }
+        }
+
+        // Check customer balance by first and last name
+         async function checkBalance() {
+            const firstName = document.getElementById('customer-firstname').value.trim();
+            const lastName = document.getElementById('customer-lastname').value.trim();
+            if (!firstName || !lastName) {
+                showResult('balance-result', 'Please enter both first and last name', 'error');
+                return;
+            }
+
+            showResult('balance-result', 'Fetching customer balance...', 'info');
+            try {
+        const response = await fetch(`/customer`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ firstName, lastName })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to fetch balance');
+        }
+
+        showResult('balance-result', `Current balance for customer ${firstName} ${lastName}: ${data.balance} DA`, 'success');
+        document.getElementById('balance-update-row').style.display = 'flex';
+
+    } catch (error) {
+        console.error('Error:', error);
+        showResult('balance-result', error.message || 'An error occurred while fetching balance', 'error');
+    }
+}
+
+   // Update customer balance
+   async function updateBalance() {
+    const firstName = document.getElementById('customer-firstname').value.trim();
+    const lastName = document.getElementById('customer-lastname').value.trim();
+    const amount = parseFloat(document.getElementById('balance-amount').value);
+
+    if (!firstName || !lastName || !amount) {
+        showResult('balance-result', 'Please enter first name, last name, and amount', 'error');
+        return;
+    }
+
+    showResult('balance-result', 'Updating customer balance...', 'info');
+
+    try {
+        const response = await fetch(`/update-balance`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ firstName, lastName, amount })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to update balance');
+        }
+
+        showResult('balance-result', `Successfully updated balance for customer ${firstName} ${lastName} by ${amount} DA`, 'success');
+
+        document.getElementById('balance-amount').value = '';
+        document.getElementById('customer-firstname').value = '';
+        document.getElementById('customer-lastname').value = '';
+        document.getElementById('balance-update-row').style.display = 'none';
+
+    } catch (error) {
+        console.error('Error:', error);
+        showResult('balance-result', error.message || 'An error occurred while updating balance', 'error');
+    }
+}
+
+
+        // Helper function to show results
+        function showResult(elementId, message, type) {
+        const element = document.getElementById(elementId);
+        element.textContent = message;
+        element.style.borderLeftColor = 
+        type === 'error' ? 'var(--danger-color)' : 
+        type === 'success' ? 'var(--success-color)' : 
+        type === 'normal' ? 'blue' : 'var(--primary-color)';
+        if (type !== 'normal') {
+        setTimeout(() => {
+            showResult(elementId, '', 'normal');
+        }, 10000);
+        }
+        }
+
+
+        // Check account verification status
+        async function checkVerification() {
+    const firstName = document.getElementById('customer-firstnamev').value.trim();
+    const lastName = document.getElementById('customer-lastnamev').value.trim();
+
+    if (!firstName || !lastName) {
+        showResult('verification-result', 'Please enter both first name and last name', 'error');
+        return;
+    }
+
+
+    try {
+        const response = await fetch("/account/verification-status", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ firstName, lastName })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to check verification status');
+        }
+
+        if (data.verified) {
+            showResult('verification-result', `Account for ${firstName} ${lastName} is already verified`, 'success');
+            document.getElementById('verification-update-row').style.display = 'none';
+        } else {
+            showResult('verification-result', `Account for ${firstName} ${lastName} is not verified. Please provide ID card number.`, 'warning');
+            document.getElementById('verification-update-row').style.display = 'flex';
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showResult('verification-result', error.message || 'An error occurred while checking verification status', 'error');
+    }
+}
+
+
+        async function verifyAccount() {
+    const firstName = document.getElementById('customer-firstnamev').value.trim();
+    const lastName = document.getElementById('customer-lastnamev').value.trim();
+    const idCardNumber = document.getElementById('id-card-number').value.trim();
+
+    if (!firstName || !lastName || !idCardNumber) {
+        showResult('verification-result', 'Please enter first name, last name, and ID card number', 'error');
+        return;
+    }
+
+    showResult('verification-result', 'Verifying account...', 'info');
+
+    try {
+        const response = await fetch("/account/verify", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                firstName: firstName,
+                lastName: lastName,
+                idCardNumber: idCardNumber
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Failed to verify account');
+        }
+
+        showResult('verification-result', `Account for ${firstName} ${lastName} has been successfully verified`, 'success');
+
+        document.getElementById('customer-firstname').value = '';
+        document.getElementById('customer-lastname').value = '';
+        document.getElementById('id-card-number').value = '';
+        document.getElementById('verification-update-row').style.display = 'none';
+    } catch (error) {
+        console.error('Error:', error);
+        showResult('verification-result', error.message || 'An error occurred while verifying account', 'error');
+    }
+}
+
+    </script>
+</body>
+</html>
